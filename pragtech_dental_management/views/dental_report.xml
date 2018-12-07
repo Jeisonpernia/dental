@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<report
+		id="report_dental"
+		string="Appointments Receipts"
+		model="medical.appointment"
+		report_type="qweb-pdf"
+		file="pragtech_dental_management.report_appointment"
+		name="pragtech_dental_management.report_appointment"
+		/>
+
+
+		<report
+		id="income_byreport_report12333"
+		string="Income By Doctor"
+		model="income.by.doctor.report.wizard"
+		report_type="qweb-pdf"
+		file="pragtech_dental_management.report_income_by_doctor"
+		name="pragtech_dental_management.report_income_by_doctor"
+		/>
+		
+		
+		<report
+		id="patient_byreport_report12333"
+		string="Patient By Doctor"
+		model="patient.by.doctor.report.wizard"
+		report_type="qweb-pdf"
+		file="pragtech_dental_management.report_patient_by_doctor"
+		name="pragtech_dental_management.report_patient_by_doctor"
+		/>
+
+	</data>
+</odoo>

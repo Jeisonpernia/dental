@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record model="appointment.state.color" id="state1">
+            <field name="state">draft</field>
+            <field name="color">rgba(253,90,165,1)</field>
+        </record>
+        <record model="appointment.state.color" id="state2">
+            <field name="state">sms_send</field>
+            <field name="color">rgba(211,51,239,1)</field>
+        </record>
+        <record model="appointment.state.color" id="state3">
+            <field name="state">confirmed</field>
+            <field name="color">rgba(105,74,242,1)</field>
+        </record>
+        <record model="appointment.state.color" id="state4">
+            <field name="state">missed</field>
+            <field name="color">rgba(244,57,59,1)</field>
+        </record>
+        <record model="appointment.state.color" id="state5">
+            <field name="state">checkin</field>
+            <field name="color">rgba(105,242,116,1)</field>
+        </record>
+        <record model="appointment.state.color" id="state6">
+            <field name="state">done</field>
+            <field name="color">rgba(32,142,21,1)</field>
+        </record>
+        <record model="appointment.state.color" id="state7">
+            <field name="state">cancel</field>
+            <field name="color">rgba(239,108,13,0.7)</field>
+        </record>
+    </data>
+</odoo>

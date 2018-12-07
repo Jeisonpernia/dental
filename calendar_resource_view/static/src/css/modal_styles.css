@@ -1,0 +1,64 @@
+.patient_div, .physician_div {
+  column-count: 4;
+  /*background: green;*/
+  /*border: 1px solid;*/
+  column-rule: 1px solid;
+}
+.box {
+    height: 31px;
+    margin-top: 5px;
+}
+.box .contents {
+    font-weight: bold;
+}
+
+.box.patient input.patient_list{
+    visibility: hidden;
+}
+.box input,.box select,.box option{
+    height: 27px;
+    /*border-radius: 4px;*/
+}
+.box.app_end div.bootstrap-datetimepicker-widget {
+    position: absolute !important;
+    top: auto !important;
+    left: 75% !important;
+    right: 0px !important;
+}
+.box.app_start div.bootstrap-datetimepicker-widget {
+    position: absolute !important;
+    top: auto !important;
+    left: 25% !important;
+    right: 0px !important;
+}
+
+.calendar-dialog{
+    width: 61%;
+}
+.calendar-footer button{
+    float: left;
+}
+
+/*styles for the open-chart*/
+#teethchart_adult {
+    width: 700px !important;
+    margin-left: 25%;
+    margin-top: -483px;
+    position: relative;
+}
+/*.mapster_el, .teethchartadult {
+    width: 700px !important;
+}*/
+.numbering, .numbering_below {
+    width: 725px !important;
+    margin-left: 6%;
+}
+.mouth_selection div {
+    float: left !important;
+    padding-left: 20px;
+}
+.states {
+    text-align: center;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}

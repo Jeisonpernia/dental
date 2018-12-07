@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="report_patient_invoice">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="web.external_layout">
+                        <t t-set="o" t-value="o.with_context({'lang':o.partner_id.lang})" />
+                            <div class="page">
+                                <div class="text-center">
+                                    <h2>SERVICE BILL</h2>
+                                    <center>
+
+                                    <table name="invoice_line_table" width="90%">
+                                        <colgroup>
+                                            <col width='25%' />
+                                            <col width='25%' />
+                                            <col width='25%' />
+                                            <col width='25%' />
+                                        </colgroup>
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="patient_invoice_tbody">
+                                            <tr>
+                                                <td><strong>Bill No.</strong></td>
+                                                <td>: <span t-field="o.number"/></td>
+                                                <td><strong>Invoice Date</strong></td>
+                                                <td>: <span t-field="o.date_invoice"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Patient name</strong></td>
+                                                <td>: <span t-field="o.partner_id.name"/></td>
+                                                <td><strong>Billing Date</strong></td>
+                                                <td>: <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%m/%d/%Y %H:%M')"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Patient ID</strong></td>
+                                                <td>: <span t-field="o.patient.patient_id"/>
+                                                </td>
+                                                <td><strong>Doctor </strong></td>
+                                                <td>: <span t-field="o.dentist"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>OP No.</strong></td>
+                                                <td>: <t t-if="o.appt_id">
+                                                    <span t-field="o.appt_id"/>
+                                                </t></td>
+                                                <td><strong>Insurance Company</strong></td>
+                                                <td>: <span t-field="o.insurance_company"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                        <br/>
+                                        <t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+                                        <t t-set="disc_amt_total" t-value="0"/>
+
+                    <table class="table table-condensed" name="invoice_line_table">
+                        <colgroup>
+                            <col/>
+                            <col/>
+                            <col width='13%' />
+                            <col width='13%' />
+                            <col t-if="display_discount" width='13%' />
+                            <col width='15%' />
+                            <col width='13%' />
+                            <col width='13%' />
+                        </colgroup>
+                        <thead style="border-top: 1px solid black;border-bottom:1px solid #000000;">
+                            <tr>
+                                <th>Service</th>
+                                <th>Description</th>
+                                <th class="text-right">Quantity</th>
+                                <th class="text-right">Unit Price</th>
+                                <th t-if="display_discount" class="text-right">Disc.(%)</th>
+                                <th t-if="o.insurance_company" class="text-right">Treatment Group Disc.(%)</th>
+                                <th t-if="o.insurance_company" class="text-right">Co-Payment(%)</th>
+                                <th class="text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="invoice_tbody" style="border-bottom: 1px solid black;border-top: 1px solid black;">
+                            <tr t-foreach="o.invoice_line_ids" t-as="l">
+                                <td><span t-field="l.product_id"/></td>
+                                <td><span t-field="l.name"/></td>
+                                <td class="text-right">
+                                    <span t-field="l.quantity"/>
+                                    <span t-field="l.uom_id"  groups="product.group_uom"/>
+                                </td>
+                                <td class="text-right">
+                                    <span t-field="l.price_unit"/>
+                                </td>
+                                <td t-if="display_discount" class="text-right">
+                                    <span t-esc="round(l.discount,2)"/>
+                                    <t t-if="l.discount">
+                                        <t t-set="disc_amt_total" t-value="disc_amt_total + ((l.price_unit*l.quantity*l.discount*l.amt_paid_by_patient)/10000)"/>
+                                    </t>
+                                </td>
+                                <td t-if="o.insurance_company" class="text-right">
+                                    <span t-field="l.discount_amt"/>
+                                </td>
+                                <td t-if="o.insurance_company" class="text-right">
+                                    <span t-field="l.amt_paid_by_patient"/>
+                                </td>
+                                <td class="text-right" id="subtotal">
+                                    <span t-field="l.price_subtotal"
+                                        t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                        <div id="total" class="row pull-right">
+                            <div>
+                                <table class="table-condensed" style="min-width: 250px;max-width: 400px;">
+                                    <t t-if="disc_amt_total > 0">
+                                        <tr style="border-bottom:1px solid #000000;">
+                                            <td><strong>Clinic Disc. Total</strong></td>
+                                            <td class="text-right">
+                                                <span t-esc="disc_amt_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <tr style="border-bottom:1px solid #000000;">
+                                        <td><strong>Total</strong></td>
+                                        <td class="text-right">
+                                            <span t-field="o.amount_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                        </td>
+
+                                    </tr>
+                                    <t t-set="payments_vals" t-value="o._get_payments_vals()"/>
+                                    <t t-foreach="payments_vals" t-as="payment_vals">
+                                        <tr>
+                                            <td>
+                                                <i class="oe_form_field text-right oe_payment_label">Paid by <t t-esc="payment_vals['journal_name']"/> on <t t-esc="payment_vals['date']"/></i>
+                                            </td>
+                                            <td class="text-right">
+                                                <span t-esc="payment_vals['amount']" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-if="len(payments_vals) > 0">
+                                        <tr class="border-black">
+                                            <td><strong>Amount Due</strong></td>
+                                            <td class="text-right">
+                                                 <span t-field="o.residual" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </table>
+                            </div>
+                        </div>
+
+
+                                    </center>
+                                </div>
+                            </div>
+                    </t>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

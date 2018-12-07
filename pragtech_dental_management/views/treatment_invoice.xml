@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="treatment_invoice_view">
+        <field name="name">Treatment Line</field>
+        <field name="model">treatment.invoice</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Treatment">
+                <group>
+                    <group>
+                        <field name="appointment_id"/>
+                        <field name="description"/>
+                    </group>
+                    <group>
+                        <field name="treatment_id"/>
+                        <field name="amount"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="treatment_invoice_tree">
+        <field name="name">Treatment Invoice</field>
+        <field name="model">treatment.invoice</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Treatment Lines" editable="bottom">
+                <field name="appointment_id" invisible="1"/>
+                <field name="treatment_id" invisible="1"/>
+                <field name="description"/>
+                <field name="note"/>
+                <field name="amount"/>
+            </tree>
+        </field>
+    </record>
+
+</odoo>
