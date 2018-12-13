@@ -1018,7 +1018,7 @@
 					<field name="state" invisible="1"/>
 				</group>
 				<group col="2" colspan="1" rowspan="1">
-					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120" widget="image"/>
+					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120" />
 				</group>
 				</group>
 				<notebook>
@@ -2669,7 +2669,7 @@
 					<field name="teeth_id" />
 					<!-- <field name="tooth_function_field"/> -->
 					<field name="state" />
-					<field name="signature" widget="image" width="80" height="60" readonly="1"/>
+					<field name="signature" width="80" height="60" readonly="1"/>
                 	<button name="action_consent_form" string="Open consent form" type="object" icon="fa-edit"/>
 					<field name="dentist" />
 					<field name="detail_description" />

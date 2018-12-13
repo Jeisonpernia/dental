@@ -12,7 +12,7 @@
                 'web_domain_field',
                 'web_notify',
                 'web_digital_sign',
-                'web_tree_image',
+                # 'web_tree_image',
                 ],
     'description': """
 This modules includes Medical Management Features

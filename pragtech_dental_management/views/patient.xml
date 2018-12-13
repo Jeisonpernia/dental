@@ -42,7 +42,7 @@
 
 				</group>
 				<group col="2" colspan="2" string="Picture" rowspan="1">
-					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120" widget="image"/>
+					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120"/>
 				</group>
 				</group>
 				<notebook>

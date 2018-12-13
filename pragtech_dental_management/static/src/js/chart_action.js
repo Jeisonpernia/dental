@@ -28,8 +28,8 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 	var imageMapList = new Array();
 	var selected_surface = new Array();
 
-	//console.log("Loaddddddd   ")
-	//console.log("Selected surface   ",selected_surface)
+//	//console.log("Loaddddddd   ")
+//	//console.log("Selected surface   ",selected_surface)
 	var is_tooth_select = false
 	var selected_category = '';
 	var treatment_lines = new Array();
@@ -43,7 +43,8 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 	var action_on_teeth = new Array();
 	var other_patient_history = new Array();
 	/*CHANGED HERE*/
-	var dignosis_records = new Array();
+//	var dignosis_records = new Array();
+	var dignosis_records = {};
 
 	var self_var;
 	//Tooth Number selection array list
@@ -478,7 +479,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 				}
 
                  _.each(other_patient_history, function(each_operation) {
-				  //console.log("touched line 463")
+//				  //console.log("touched line 463")
 
                     imageMapList = each_operation['surface'];
                     var ts = imageMapList ;
@@ -487,15 +488,15 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
                     var tempImageMapList = new Array();
                     //var tooth_surface = (imageMapList[0].split('_'))[0];
 
-					//console.log('inside fn call line 458 ts is',ts,tooth_surface);
+//					//console.log('inside fn call line 458 ts is',ts,tooth_surface);
 
                       var surface_chk =((tooth_surface == 'root')||(tooth_surface == 'crown')||(tooth_surface == 'toothcap'));
-                      //console.log("checking the surface ",surface_chk);
+//                      //console.log("checking the surface ",surface_chk);
 
 
                         if ((each_operation.tooth_id) && (!surface_chk)){
 
-                            //console.log("before calling colouring function.......")
+//                            //console.log("before calling colouring function.......")
                             self.color_surfaces(svg, each_operation['surface'].split(' '), each_operation['tooth_id'], self);
 
                         }
@@ -518,13 +519,13 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
                              if(each_operation['surface']=='Upper_Jaw'){
                              for ( var i=1; i<=17;i++)
                                     keystr += ',toothcap_'+i;
-                                     //console.log('in on load from history',keystr);
+//                                     //console.log('in on load from history',keystr);
                                      localStorage.setItem('upperkeys', keystr);
                               }
                              if(each_operation['surface']=='Lower_Jaw'){
                              for ( var i=17; i<=32;i++)
                                       keystr += ',toothcap_'+i;
-                                      //console.log('in chart action',keystr);
+//                                      //console.log('in chart action',keystr);
                                      localStorage.setItem('lowerkeys', keystr);
                               }
 
@@ -563,7 +564,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 						return;
 					}
 					selected_tooth = this.id;
-					//console.log("Execute Create 111");
+//					//console.log("Execute Create 111");
 					self.execute_create(false, self, false);
 
 					switch(selected_treatment.action) {
@@ -622,11 +623,11 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 			if(e.target !== e.currentTarget){
 			   //we only need to hear events from the area (children of map), so we ignore any other events that are called when the parent is clicked by this if statement
 				tid = e.target.id;
-				//console.log("here is map area id" ,tid)
+//				//console.log("here is map area id" ,tid)
 				var t = new Array();
 				t = tid.split('_');
 				toothmap_id = t[1];
-				//console.log("tooth map id extract"+ toothmap_id);
+//				//console.log("tooth map id extract"+ toothmap_id);
 				selected_tooth = toothmap_id;
                 tooth_by_part = 1;
 
@@ -645,12 +646,12 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
          if(e.target !== e.currentTarget){
 			   //we only need to hear events from the area (children of map), so we ignore any other events that are called when the parent is clicked by this if statement
 				tid = e.target.id;
-				//console.log("here is map area id" ,tid)
+//				//console.log("here is map area id" ,tid)
 				alert('heloooooooo',tid)
 				var t = new Array();
 				t = tid.split('_');
 				toothmap_id = t[1];
-				//console.log("tooth map id extract"+ toothmap_id);
+//				//console.log("tooth map id extract"+ toothmap_id);
 				selected_tooth = toothmap_id;
                 tooth_by_part = 1;
 
@@ -662,15 +663,15 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 
 
 				$(".view").click(function() {
-					//console.log('in click-------------')
-					//console.log("tooth_by_part",tooth_by_part);
-					//console.log("setting toothbpart as zero")
+//					//console.log('in click-------------')
+//					//console.log("tooth_by_part",tooth_by_part);
+//					//console.log("setting toothbpart as zero")
 					tooth_by_part = 0;
 					var surf = selected_surface;
 					var chksurf= surf.slice(0,-3);
 
 					if ((chksurf=='root')||(chksurf=='crown')||(chksurf=='toothcap')){
-					//console.log("the surface is chksurf insideeee",chksurf);
+//					//console.log("the surface is chksurf insideeee",chksurf);
 				       selected_surface = [];
 				    }
 					if(!tooth_by_part){
@@ -678,7 +679,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 						selected_surface.length = 0;
 						cont = true;
 					} else {
-						//console.log("Else In click ----")
+//						//console.log("Else In click ----")
 
 
 						  if (selected_surface[0]) {
@@ -695,7 +696,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 					}
 					var found_selected_operation = self.$el.find('.selected_operation');
 					if (found_selected_operation[0]) {
-						//console.log("FOund selected operation")
+//						//console.log("FOund selected operation")
 						var op_id = ((found_selected_operation[0].id).split('_'))[1];
 						if ($('#status_' + op_id)[0].innerHTML == 'Completed'){
 							alert('Cannot update Completed record');
@@ -732,8 +733,8 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 					}
 					selected_tooth = ((this.id).split('_'))[1];
 					if (1) {
-                        //console.log("KKKKKKKKKKKK")
-                        //console.log("inside click view fn",selected_tooth)
+//                        //console.log("KKKKKKKKKKKK")
+//                        //console.log("inside click view fn",selected_tooth)
                              //if ($("#" + $(this).attr('id')).attr('fill') == 'white') {
 //							//selected_surface.push(this.id);//js
 //							$("#" + $(this).attr('id')).attr('fill', 'orange');
@@ -752,46 +753,46 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 //							$("#" + $(this).attr('id')).attr('fill', 'white');//js
 //						}
 						if ($("#" + $(this).attr('id')).attr('fill') == 'white') {
-							//console.log("11111111111111   ",is_tooth_select)
+//							//console.log("11111111111111   ",is_tooth_select)
 							$("#" + $(this).attr('id')).attr('fill', 'orange');
-							//console.log("==============    ",selected_surface)
+//							//console.log("==============    ",selected_surface)
 							var available = selected_surface.indexOf(this.id);
-							//console.log("Available  -->>>> ",available)
+//							//console.log("Available  -->>>> ",available)
 							if(available == -1 && is_tooth_select == false){
-								//console.log("pppppppuuuuuushh 1")
+//								//console.log("pppppppuuuuuushh 1")
 
 								selected_surface.push(this.id);
-								//console.log("after....",this.id,selected_surface)
+//								//console.log("after....",this.id,selected_surface)
 							}
 
 						} else if (parseInt(($("#" + $(this).attr('id')).attr('class')).split(' ')[3]) == 0){
-							//console.log("222222222222222")
+//							//console.log("222222222222222")
 							is_tooth_select = false
 							$("#" + $(this).attr('id')).attr('fill', 'white');
 							var index = selected_surface.indexOf(this.id);
 							selected_surface.splice(index, 1);
 						} else {
-							//console.log("3333333333333333333  ",$("#" + $(this).attr('id')))
-							//console.log("-------**-    ",$("#" + $(this).attr('id')).attr('fill'))
+//							//console.log("3333333333333333333  ",$("#" + $(this).attr('id')))
+//							//console.log("-------**-    ",$("#" + $(this).attr('id')).attr('fill'))
 //
 							if ($("#" + $(this).attr('id')).attr('fill') == 'orange') {
 							$("#" + $(this).attr('id')).attr('fill', 'white');
-							//console.log("Thisssssssssssssssssssss   *   ",this.id)
+//							//console.log("Thisssssssssssssssssssss   *   ",this.id)
 							is_tooth_select = true
-							//console.log("  &&&&&&&&     ",selected_surface)
+//							//console.log("  &&&&&&&&     ",selected_surface)
 							var current_tooth_id = this.id.lastIndexOf("_")
 							var res = this.id.slice(current_tooth_id, this.id.length);
-							//console.log("RESSSSSSSSSSSSSSSSSSS   ",res)
+//							//console.log("RESSSSSSSSSSSSSSSSSSS   ",res)
 
 							}
 							else{
-								//console.log("44444444444444444444");
+//								//console.log("44444444444444444444");
 								selected_surface.push(this.id);
 
 							}
 						}
 					}
-////					console.log('selected_surface',selected_surface,selected_surface.length)
+//////					console.log('selected_surface',selected_surface,selected_surface.length)
 				});
 
 				self.get_treatment_cats().then(function(res) {
@@ -829,7 +830,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 											$('#treat_' + categ_no + '_' + each_treatment.treatment_id).click(function() {
 											    var found_selected_tooth;
 												if (full_mouth_selected == 1) {
-                                                  //console.log('inside fullmouthcall');
+//                                                  //console.log('inside fullmouthcall');
 													self.put_data_full_mouth(self, full_mouth_teeth, full_mouth_selected, each_treatment, 'planned','Full_mouth',false, false, false);
 													full_mouth_selected = 0;
 													return;
@@ -838,7 +839,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
                                                     var upper_mouth = new Array();
                                                     for (var select_up_tooth = 1; select_up_tooth <= 16; select_up_tooth++) {
                                                     upper_mouth.push(select_up_tooth);}
-												    //console.log('inside uppermouthcall');
+//												    //console.log('inside uppermouthcall');
 													self.put_data_full_mouth(self, upper_mouth, upper_mouth_selected, each_treatment, 'planned', 'Upper_Jaw',false, false, false);
 													upper_mouth_selected = 0;
 													return;
@@ -847,7 +848,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 												    var lower_mouth = new Array();
                                                     for (var select_up_tooth = 1; select_up_tooth <= 16; select_up_tooth++) {
                                                     lower_mouth.push(select_up_tooth);}
-												    //console.log('inside lower_mouthcall');
+//												    //console.log('inside lower_mouthcall');
 													self.put_data_full_mouth(self, lower_mouth, lower_mouth_selected, each_treatment, 'planned','Lower_Jaw',false, false, false);
 													lower_mouth_selected = 0;
 													return;
@@ -875,8 +876,8 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 												if (found_selected_tooth[0]) {
 													selected_surface.length = 0;
 												}
-												//console.log("found_selected_tooth   ",found_selected_tooth[0])
-												//console.log("selected_surface ---   ",selected_surface)
+//												//console.log("found_selected_tooth   ",found_selected_tooth[0])
+//												//console.log("selected_surface ---   ",selected_surface)
 												is_tooth_select = false
 
 												if (selected_surface[0]) {
@@ -887,7 +888,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 														}
 														$('#treat_' + categ_no + '_' + each_treatment.treatment_id).attr('class', 'selected_treatment');
 														selected_treatment = each_treatment;
-														//console.log("Execute Create 22222222222  ",selected_surface);
+//														//console.log("Execute Create 22222222222  ",selected_surface);
 														self.execute_create(true, self, selected_surface);
 													}
 													else{
@@ -912,7 +913,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
                                                         selected_treatment = each_treatment;
 														_.each(found_selected_tooth, function(each_found_selected_tooth) {
 															selected_tooth = each_found_selected_tooth.id;
-															//console.log("*************    ",selected_tooth)
+//															//console.log("*************    ",selected_tooth)
 															selected_surface.length = 0;
 															if($("#" +'view_' + selected_tooth + '_top').attr('fill') == 'orange'){
 																selected_surface.push('view_' + selected_tooth + '_top');
@@ -929,7 +930,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 															if($("#" +'view_' + selected_tooth + '_left').attr('fill') == 'orange'){
 																selected_surface.push('view_' + selected_tooth + '_left');
 															}
-															//console.log("##########################    ", $("#" +'view_' + selected_tooth + '_top').attr('fill') )
+//															//console.log("##########################    ", $("#" +'view_' + selected_tooth + '_top').attr('fill') )
 
 
 
@@ -938,8 +939,8 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 																Missing_Tooth.push(parseInt(selected_tooth));
 																self.perform_missing_action([selected_tooth]);
 															}
-															//console.log("Execute Create 33333335 " );
-															//console.log("Surfaceeeeeeeeeeeee  &&&&&&&&&&&& ",selected_surface)
+//															//console.log("Execute Create 33333335 " );
+//															//console.log("Surfaceeeeeeeeeeeee  &&&&&&&&&&&& ",selected_surface)
 															self.execute_create(true, self, false);
 															$(each_found_selected_tooth).removeClass('selected_tooth');
 														});
@@ -969,7 +970,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 		},
 start:function(){
 
-
+        this._super();
 
 
 },
@@ -1047,7 +1048,7 @@ start:function(){
 					each_operation['status'] = 'in_progress';
 				if (each_operation['tooth_id']){
 
-					//console.log("Prgogresss  writing patient history ")
+//					//console.log("Prgogresss  writing patient history ")
 
 					imageMapList = each_operation['surface'];
 					var ts = imageMapList ;
@@ -1056,7 +1057,7 @@ start:function(){
 //                    var tooth_surface = imageMapList;
                     //var tooth_surface = ts.slice(0,-3);
                     var surface_chk =((tooth_surface == 'root')||(tooth_surface == 'crown')||(tooth_surface == 'toothcap'));
-					//console.log('write while  writing patient history',tooth_surface,imageMapList,surface_chk);
+//					//console.log('write while  writing patient history',tooth_surface,imageMapList,surface_chk);
 
 					if((tooth_surface == 'root')||(tooth_surface == 'crown')||(tooth_surface == 'toothcap'))
 					{
@@ -1064,7 +1065,7 @@ start:function(){
                   //   keyList.push(imageMapList+'_'+ts);
 				     var mapkeystr = keyList +',';
 
-                    //console.log("reachedhere to put toothkeys",mapkeystr);
+//                    //console.log("reachedhere to put toothkeys",mapkeystr);
                     localStorage.setItem('test', mapkeystr);
 
                     }
@@ -1073,11 +1074,11 @@ start:function(){
 						each_operation['tooth_id'], false,
 						each_operation['status'], each_operation['created_date'],
 						is_prev_record_from_write, each_operation['other_history'],
-						each_operation['dignosis'],each_operation['dignosis_description']
+						each_operation['dignosis'],each_operation['dignosis_note']
 					);
 				}
 				else {
-				//console.log("reached line 1048........before putting in page")
+//				//console.log("reached line 1048........before putting in page")
 					self_var.put_data_full_mouth(self_var, each_operation.multiple_teeth, 1, selected_treatment, each_operation['status'],each_operation['surface'], each_operation['created_date'], is_prev_record_from_write, each_operation['other_history']);
 
 				}
@@ -1150,13 +1151,13 @@ start:function(){
 
                                     if($(this).is(':checked'))
                                     {
-                                      //console.log($(this).val());
+//                                      //console.log($(this).val());
                                       var selected_chkbox =($(this).val());
                                       var keystr = 'tooth';
                                       if (selected_chkbox == 'uppermouth'){
                                       for ( var i=1; i<=17;i++)
                                        keystr += ',toothcap_'+i;
-                                      //console.log('in chart action',keystr);
+//                                      //console.log('in chart action',keystr);
                                      localStorage.setItem('upperkeys', keystr);
                                      upper_mouth_selected = 1;
 
@@ -1164,7 +1165,7 @@ start:function(){
                                       if (selected_chkbox == 'lowermouth'){
                                       for ( var i=16; i<=33;i++)
                                        keystr += ',toothcap_'+i;
-                                      //console.log('in chart action',keystr);
+//                                      //console.log('in chart action',keystr);
                                      localStorage.setItem('lowerkeys', keystr);
                                      lower_mouth_selected = 1;
                                       };
@@ -1206,17 +1207,17 @@ start:function(){
 //			self.$('#refresh_screen').click(function(){
 //			window.location.reload();
 //			self.perform_action().then(function() {
-////				console.log('i m at line 1149 self.perform_action and .then')
+//////				console.log('i m at line 1149 self.perform_action and .then')
 //
 //
 //				});
 //			});
 			self.$('#close_screen').click(function() {
 			   // localStorage.clear();
-				//console.log("Perform Action  click on close button::::::   ")
+//				//console.log("Perform Action  click on close button::::::   ")
 				self.perform_action().then(function() {
-				self.window_close();
-             });
+					self.window_close();
+				 });
 			});
 
 			rpc.query({
@@ -1308,7 +1309,7 @@ start:function(){
 					if (op_id) {
 						$('#operation_' + op).removeClass('selected_operation');
 						var teeth_id = document.getElementById('tooth_' + op);
-						//console.log("teeth_id",teeth_id);
+//						//console.log("teeth_id",teeth_id);
                         var created_date = document.getElementById('date_time_' + op);
 						var prev_record = document.getElementById('previous_' + op);
 						var status_id = document.getElementById('status_' + op);
@@ -1326,7 +1327,7 @@ start:function(){
 						/*CHANGED HERE */
 						var dignosis_code = $('#dignosis_code_' + op)[0].value;
 
-						var dignosis_description = $('#dignosis_description_' + op)[0].value;
+						var dignosis_note = $('#dignosis_note_' + op)[0].value;
 
 						_.each(surface_list, function(each_surface) {
 							vals.push(each_surface);
@@ -1338,7 +1339,7 @@ start:function(){
 						});
 						values.push(categ_list);
 						var actual_tooth = String(teeth_id.id);
-						//console.log("inside perform action " ,"teeth_id  document.getElementById('tooth_' + op)"+teeth_id,"tooth $('#tooth_' + op).attr('class');"+tooth,"actual_tooth = String(teeth_id.id);"+actual_tooth);
+//						//console.log("inside perform action " ,"teeth_id  document.getElementById('tooth_' + op)"+teeth_id,"tooth $('#tooth_' + op).attr('class');"+tooth,"actual_tooth = String(teeth_id.id);"+actual_tooth);
 						treatment_lines_2.push({
 							'status' : String(status_id.innerHTML),
 							'status_name' : status_name,
@@ -1351,8 +1352,8 @@ start:function(){
 							'dignosis_description':dignosis_description
 						});
 
-						//console.log("Treatment lines printing ---------------")
-						//console.log(treatment_lines_2);
+//						//console.log("Treatment lines printing ---------------")
+//						//console.log(treatment_lines_2);
 
 					}
 				}
@@ -1372,7 +1373,7 @@ start:function(){
 //				$def.resolve(res);
 //			});
 			return $def;
-        //console.log('i m at line 1294');
+//        //console.log('i m at line 1294');
 
 		},
 		window_close : function() {
@@ -1381,7 +1382,8 @@ start:function(){
             localStorage.removeItem('upperkeys');
             localStorage.removeItem('lowerkeys');
 			window.history.back();
-            location.reload();
+			setTimeout(function(){  location.reload(); }, 100);
+
 			/* this.do_action({
 				type : 'ir.actions.client',
 				tag : 'history_back'
@@ -1397,7 +1399,7 @@ start:function(){
 			return 0;
 		},
 		execute_create : function(attrs, self_var, selected_surface_temp) {
-			//console.log(" inside execute create ---Selected surface temp, selected tooth -- ",selected_surface_temp,selected_tooth)
+//			//console.log(" inside execute create ---Selected surface temp, selected tooth -- ",selected_surface_temp,selected_tooth)
 			if (!selected_surface_temp) {
 				selected_surface_temp = selected_surface;
 			}
@@ -1417,7 +1419,7 @@ start:function(){
 			var surfaces = new Array();
 			_.each(selected_surface_temp, function(each_surface) {
 				var surface = ($('#'+each_surface).attr('class')).split(' ')[1];
-				//console.log("Each Surface **  ",surface)
+//				//console.log("Each Surface **  ",surface)
 				surfaces.push(surface);
 			});
 			var d = new Array();
@@ -1425,13 +1427,13 @@ start:function(){
 				'treatment_id' : selected_treatment['treatment_id'],
 				'vals' : surfaces
 			};
-			//console.log(" ddddddddddd   ",d)
+//			//console.log(" ddddddddddd   ",d)
 			var selected_tooth_temp = selected_tooth;
 			if (attrs) {
 				if (!tooth_present) {
 					record['treatments'].push(d);
 					treatment_lines.push(record);
-					//console.log("Outtt 222222  ",surfaces)
+//					//console.log("Outtt 222222  ",surfaces)
 					/*CHANGED HERE*/
 					this.put_data(self_var, surfaces,
 						selected_tooth_temp,
@@ -1452,7 +1454,7 @@ start:function(){
 							if (!treatment_present) {
 								var x = treatment_lines;
 								treatment_lines[i]['treatments'].push(d);
-								//console.log("Putttt  333333 *******************")
+//								//console.log("Putttt  333333 *******************")
 								/*CHANGED HERE*/
 								this.put_data(self_var, surfaces,
 									selected_tooth_temp,
@@ -1471,7 +1473,7 @@ start:function(){
 					record['treatments'].push(d);
 					treatment_lines.push(record);
 					surfaces.length = 0;
-					//console.log("Putttt 333============333")
+//					//console.log("Putttt 333============333")
 					/*CHANGED HERE*/
 					this.put_data(self_var,
 						surfaces, selected_tooth_temp,
@@ -1483,10 +1485,10 @@ start:function(){
 				        record['treatments'].push(d);
 					    treatment_lines.push(record);
 					    surfaces.length = 0;
-					    //console.log("Putttt 444============444 for toooooooooooothpart")
+//					    //console.log("Putttt 444============444 for toooooooooooothpart")
 				        selected_tooth_temp = toothmap_id;
 						surfaces.push(tid);
-						//console.log("surface while in putdata",selected_tooth_temp );
+//						//console.log("surface while in putdata",selected_tooth_temp );
 						/*CHANGED HERE*/
 						this.put_data(self_var, surfaces,
 							selected_tooth_temp, '',
@@ -1563,7 +1565,7 @@ start:function(){
 				}
 				var table_str = '';
 				this.get_treatment_charge(selected_treatment_temp.treatment_id).then(function(t_charge) {
-					//console.log("Lineeeee 22222222222222222222222 ")
+//					//console.log("Lineeeee 22222222222222222222222 ")
 
 					if (!t_charge) {
 						t_charge = '0.0';
@@ -1591,9 +1593,9 @@ start:function(){
 					table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' + operation_id + '">' + selected_treatment_temp.treatment_name + '</td>';
 
 					/*CHANGED HERE - added below line*/
-					table_str += '<td id = "dignosis_' + operation_id + '"><select class = "noclass" ' +
-						'id = "dignosis_code_' + operation_id + '">' + selected_treatment_temp.treatment_name +
-						'</select></td>';
+					table_str += '<td id = "dignosis_' + operation_id + '"><input class = "noclass" ' +
+						'class="diagnosis_code" id = "dignosis_code_' + operation_id + '">' + selected_treatment_temp.treatment_name +
+						'</input></td>';
 
 
 					table_str += '<td class = "' + 'all' + '" id = "tooth_' + operation_id + '">' + '-' + '</td>';
@@ -1624,7 +1626,7 @@ start:function(){
 							var tr = document.getElementById('operation_' + actual_id);
 							var tooth = document.getElementById('tooth_' + actual_id);
 							var desc_class = $("#desc_" + actual_id).attr('class');
-                            //console.log('the tr is ',tr )
+//                            //console.log('the tr is ',tr )
 
 
 							var status = document.getElementById('status_' + actual_id);
@@ -1636,7 +1638,7 @@ start:function(){
 								var action_id = action.innerHTML;
 								if(mouth_part == 'Full_mouth') {
 								    var tooth_id = tr.className.split('_');
-								    //console.log('the tr ,tooth_idis ',tr ,tooth_id)
+//								    //console.log('the tr ,tooth_idis ',tr ,tooth_id)
 									var surf_list = new Array();
 									_.each(full_mouth_teeth_temp, function(tooth_id) {
 										surf_list.push('view_' + tooth_id + '_center');
@@ -1708,7 +1710,7 @@ start:function(){
 				}
 				var table_str = '';
 				this.get_treatment_charge(selected_treatment_temp.treatment_id).then(function(t_charge) {
-					//console.log("Lineeeee 22222222222222222222222  toothpartfn")
+//					//console.log("Lineeeee 22222222222222222222222  toothpartfn")
 
 					if (!t_charge) {
 						t_charge = '0.0';
@@ -1954,11 +1956,11 @@ start:function(){
 						var x = window.confirm("Are you sure you want to delete?");
 
 						if (x) {
-						//console.log("inside put_data_toothpart")
+//						//console.log("inside put_data_toothpart")
 							update = false;
 							cont = false;
 							var actual_id = String(this.id).substr(7);
-							//console.log(String(this.id).substr(7))
+//							//console.log(String(this.id).substr(7))
 							actual_id = parseInt(actual_id);
 							var tabel = document.getElementById('operations');
 							var tr = document.getElementById('operation_' + actual_id);
@@ -1967,7 +1969,7 @@ start:function(){
 							var desc_class = $("#desc_" + actual_id).attr('class');
 
 							var tooth_id = tr.className.split('_');
-                            //console.log("document.getElementById('tooth_' + actual_id);  and tooth_id in del" + tooth +','+tooth_id)
+//                            //console.log("document.getElementById('tooth_' + actual_id);  and tooth_id in del" + tooth +','+tooth_id)
 							var status = document.getElementById('status_' + actual_id);
 							var status_name = $(status).attr('status_name')
 							if (status_name == 'completed' || status_name == 'in_progress') {
@@ -2017,9 +2019,9 @@ start:function(){
 							status_defined,
 							created_date,
 							is_prev_record, other_history,
-							dignosis,dignosis_description) {
-            //console.log("inside put_data")
-			//console.log("SUrfacesssssssssssss   ,selected_surface_temp,tooth_by_part  ",surfaces, selected_surface_temp, tooth_by_part)
+							dignosis,dignosis_note) {
+//            //console.log("inside put_data")
+//			//console.log("SUrfacesssssssssssss   ,selected_surface_temp,tooth_by_part  ",surfaces, selected_surface_temp, tooth_by_part)
 
 			if (!selected_tooth_temp) {
 				selected_tooth_temp = '-';
@@ -2030,9 +2032,9 @@ start:function(){
 			if (created_date) {
 				today = created_date;
 			}
-			//console.log("Statussssssssss defineddddddddddddddddd   ",status_defined)
+//			//console.log("Statussssssssss defineddddddddddddddddd   ",status_defined)
 			var panned_text = $('#planned').text().trim();
-			//console.log("Put dataaa   ",panned_text)
+//			//console.log("Put dataaa   ",panned_text)
 			var status_to_use = panned_text;
 			var completed_text = $('#completed').text().trim()
 			var inprogress_text = $('#in_progress').text().trim()
@@ -2048,12 +2050,13 @@ start:function(){
 				status_to_use = panned_text;
 //				status_to_use = status_to_use.substr(0, 1).toUpperCase() + status_to_use.substr(1);
 			}
-			//console.log("_________________________  ",status_to_use)
+//			//console.log("_________________________  ",status_to_use)
+            var self = this;
 			this.get_treatment_charge(selected_treatment_temp.treatment_id).then(function(t_charge) {
 				if (!t_charge) {
 					t_charge = '0.0';
 				}
-				//console.log("Line 33333333333333333333=======")
+//				//console.log("Line 33333333333333333333=======")
 				operation_id += 1;
 				var found = self_var.$el.find('.selected_operation');
 				if (found) {
@@ -2067,9 +2070,20 @@ start:function(){
 				table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' + operation_id + '">' + selected_treatment_temp.treatment_name + '</td>';
 
 				/*Change starts here*/
+                /*autocomplete diag code start*/
+                table_str += '<td id="dignosis_' + operation_id +
+								'"><input class="diagnosis_code" id="dignosis_code_' +
+								operation_id + '">' + '</input></td>';
+                table_str += '<td id = "dignosis_note_td' + operation_id +
+								'"><input class="dignosis_note" autocomplete="off" id="dignosis_note_' +
+								operation_id + '">' + '</input></td>';
 
-				/*diagnosis code start*/
-				if (status_defined != 'completed') {
+
+                /*autocomplete diag code end*/
+
+
+				/*diagnosis code start ----------old*/
+				/*if (status_defined != 'completed') {
 					if (dignosis) {
 						if (dignosis.id) {
 							var html;
@@ -2114,11 +2128,11 @@ start:function(){
 						'"><select id = "dignosis_code_' + operation_id +
 						'">' + '<option value = "' + dignosis.id+'" >' +
 						dignosis.code+'</option>' + '</select></td>';
-				}
+				}*/
 				/*diagnosis code end*/
 
 				/*diagnosis description start*/
-				if (dignosis_description) {
+				/*if (dignosis_description) {
 					table_str += '<td id = "dignosis_description_td_' + operation_id +
 						'"><input type="text" name="dignosis_description" value=' +
 						dignosis_description+' id = "dignosis_description_' +
@@ -2129,7 +2143,7 @@ start:function(){
 					table_str += '<td id = "dignosis_description_td_' +
 						operation_id + '"><input type="text" name="dignosis_description" "' +
 						blank_val+'" id = "dignosis_description_' + operation_id + '"></td>';
-				}
+				}*/
 				/*diagnosis description end*/
 				/*Change ends here*/
 
@@ -2373,7 +2387,7 @@ start:function(){
 				table_str += '<td style = "display:none" id = "previous_' + operation_id + '">' + is_prev_record + '</td>';
 				table_str += '</tr>';
 
-				console.log("selected_treatment_temp3333333", selected_treatment_temp)
+//				console.log("selected_treatment_temp3333333", selected_treatment_temp)
 				$('#progres_table').append(table_str);
 				$('#operation_' + operation_id).click(function() {
 					var found = self_var.$el.find('.selected_operation');
@@ -2384,8 +2398,91 @@ start:function(){
 				});
 
 				/*CHANGED HERE */
-				/*DIAGNOSIS CODE ONCHANGE START*/
-				$('#dignosis_code_' + operation_id).change(function () {
+				$('#dignosis_code_'+operation_id).smartAutoComplete({
+					source: dignosis_records,
+					filter: function(term, source){
+					    var filtered_and_sorted_list = [];
+						$.each(source, function(item){
+                            if (item.includes(term)) {
+                                filtered_and_sorted_list.push(item);
+                            }
+                        });
+
+                        return filtered_and_sorted_list;
+                    }
+			    });
+                $('#dignosis_code_'+operation_id).bind({
+                    /*keyIn: function(ev){
+                        var tag_list = ev.customData.query.split(",");
+                        //pass the modified query to default event
+                        ev.customData.query = $.trim(tag_list[tag_list.length - 1]);
+                    },*/
+					itemSelect: function(ev, selected_item){
+					    //get the text from selected item
+                        var selected_value = $(selected_item).text();
+                        console.log("eeeeeeee", selected_value)
+                        //hide results container
+                        $(this).trigger('lostFocus');
+
+                        self.update_diag_code($(this).attr('id'), selected_value);
+                        /*
+
+
+                        var cur_list = $(this).val().split(",");
+                        cur_list[cur_list.length - 1] = selected_value;
+//                      $(this).val(cur_list.join(",") + ",");
+                        $('#dignosis_code_'+operation_id).text('fffffffff');
+                        //set item selected property
+                        options.setItemSelected(true);
+
+                        //hide results container
+                        $(this).trigger('lostFocus');
+
+                        //prevent default event handler from executing
+                        ev.preventDefault();*/
+                      },
+
+			  	});
+				/*autocomplete diag code start*/
+				/*function split(val) {
+                    return val.split(/,\s*!/);
+                }
+                function extractLast(term) {
+                    return split(term).pop();
+                }
+				$('.diagnosis_code').autocomplete({
+                    select: function (event, ui) {
+                        console.log("tttttttttt", event, ui)
+                        var terms = split(this.value);
+                        // remove the current input
+                        terms.pop();
+                        // add the selected item
+
+                        terms.push(ui.item.label);
+                        this.value = terms;
+
+//                        $(this).attr('data-id', ui.item.value);
+                        return false;
+                    },
+                    source: function (request, response) {
+                        var res = $.map(dignosis_records, function(item) {
+                            if (item.label.includes(request.term)) {
+                                return item;
+                            }
+                            else {
+                                return;
+                            }
+                        });
+                        response(res);
+                    }
+                });*/
+				/*autocomplete diag code end*/
+				/*$('#dignosis_code_' + operation_id).change(function () {
+//				    $(this).attr('data-id', );
+				});*/
+
+//				DIAGNOSIS CODE ONCHANGE START
+				/*$('#dignosis_code_' + operation_id).change(function () {
 					var ops_id = $(this)[0].id.split('dignosis_code_')[1];
 					rpc.query({
 		                model: 'diagnosis',
@@ -2394,12 +2491,12 @@ start:function(){
 		            }).then(function (res) {
 		            	$('#dignosis_description_' + ops_id)[0].value = res;
 		           });
-			    });
+			    });*/
 				/*DIAGNOSIS CODE ONCHANGE END*/
 				$('#delete_' + operation_id).click(function() {
 					var x = window.confirm("Are you sure you want to delete?");
 					if (x) {
-					//console.log("del of putdata");
+//					//console.log("del of putdata");
 						update = false;
 						cont = false;
 						var actual_id = String(this.id).substr(7);
@@ -2456,7 +2553,7 @@ start:function(){
 								if (parseInt(($('#view_' + tooth_id + '_top').attr('class')).split(' ')[3]) == 0)
 									$("#" + $('#view_' + tooth_id + '_top').attr('id')).attr('fill', 'white');
 							}
-                                //console.log("the surface value is ",surfaces);
+//                                //console.log("the surface value is ",surfaces);
                                 localStorage.setItem('toDel',surfaces);
 
 							tr.parentNode.removeChild(tr);
@@ -2483,6 +2580,9 @@ start:function(){
 				});
 			});
 
+		},
+		update_diag_code: function (id, value) {
+		    $('#'+id).attr('data-id', dignosis_records[value].id);
 		},
 		get_treatment_cats : function() {
 			var $def = $.Deferred();
@@ -2548,14 +2648,17 @@ start:function(){
                 method: 'get_all_records',
                 args: [],
             }).then(function(res) {
-
             	for(var i=0; i<res.length; i++){
-					dignosis_records.push(res);
+            	    /*var temp = {
+            	        label: res[i]['code'] + '/' + res[i]['description'],
+            	        value: res[i]['id']
+            	    };*/
+					dignosis_records[res[i]['code'] + '/' + res[i]['description']] = res[i];
 				}
             });
 		},
 		getkeysFromTable : function(){
-		//console.log("sending keylist to set",keyList)
+//		//console.log("sending keylist to set",keyList)
 		return keyList;
 
 		},
