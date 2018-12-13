@@ -801,7 +801,7 @@ class MedicalPatient(models.Model):
             if each_prev_pat_missing_operations.description.action_perform == 'missing': 
                 each_prev_pat_missing_operations.unlink()
         if treatment_lines:
-            current_physician = 0;
+            current_physician = 0
             for each in treatment_lines:
                 if each.get('prev_record') == 'false':
                     all_treatment = each.get('values')

@@ -441,14 +441,15 @@ h1 {
     left: 639.567px !important;
 
 }*/
+
 ul.smart_autocomplete_container li {
 	list-style: none;
     cursor: pointer;
     margin-left: -38px;
     padding: 5px;
-    background-color: #E3EBBC;
+    background-color: #c8db67;
     width: inherit;
 }
 li.smart_autocomplete_highlight {
-	background-color: #2ee62ea1 !important;
+	background-color: #d8e8ea !important;
 }

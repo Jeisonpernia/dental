@@ -45,6 +45,7 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 	/*CHANGED HERE*/
 //	var dignosis_records = new Array();
 	var dignosis_records = {};
+	var dignosis_records_by_id = {};
 
 	var self_var;
 	//Tooth Number selection array list
@@ -1074,7 +1075,7 @@ start:function(){
 						each_operation['tooth_id'], false,
 						each_operation['status'], each_operation['created_date'],
 						is_prev_record_from_write, each_operation['other_history'],
-						each_operation['dignosis'],each_operation['dignosis_note']
+						each_operation['dignosis'],each_operation['dignosis_description']
 					);
 				}
 				else {
@@ -1216,8 +1217,8 @@ start:function(){
 			   // localStorage.clear();
 //				//console.log("Perform Action  click on close button::::::   ")
 				self.perform_action().then(function() {
-					self.window_close();
-				 });
+				self.window_close();
+             });
 			});
 
 			rpc.query({
@@ -1326,6 +1327,8 @@ start:function(){
 
 						/*CHANGED HERE */
 						var dignosis_code = $('#dignosis_code_' + op)[0].value;
+						console.log($('#dignosis_note_' + op), "ddddddddddddddd", dignosis_code)
+						var d_code = dignosis_code ? dignosis_records[dignosis_code].id : null;
 
 						var dignosis_note = $('#dignosis_note_' + op)[0].value;
 
@@ -1348,8 +1351,8 @@ start:function(){
 							'values' : categ_list,
 							'prev_record' : prev_record.innerHTML,
 							'multiple_teeth' : all_teeth,
-							'dignosis_code':dignosis_code,
-							'dignosis_description':dignosis_description
+							'dignosis_code': d_code ? d_code : null,
+							'dignosis_description': dignosis_note
 						});
 
 //						//console.log("Treatment lines printing ---------------")
@@ -1564,6 +1567,7 @@ start:function(){
 					today = created_date;
 				}
 				var table_str = '';
+				var self = this;
 				this.get_treatment_charge(selected_treatment_temp.treatment_id).then(function(t_charge) {
 //					//console.log("Lineeeee 22222222222222222222222 ")
 
@@ -1593,9 +1597,12 @@ start:function(){
 					table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' + operation_id + '">' + selected_treatment_temp.treatment_name + '</td>';
 
 					/*CHANGED HERE - added below line*/
-					table_str += '<td id = "dignosis_' + operation_id + '"><input class = "noclass" ' +
-						'class="diagnosis_code" id = "dignosis_code_' + operation_id + '">' + selected_treatment_temp.treatment_name +
-						'</input></td>';
+					table_str += '<td id = "dignosis_' + operation_id + '"><input ' +
+						'class="diagnosis_code" id = "dignosis_code_' + operation_id + '">' +
+						'></td>';
+                    table_str += '<td id = "dignosis_' + operation_id + '"><input ' +
+						'class="diagnosis_note" id = "dignosis_note_' + operation_id + '">' +
+						'/></td>';
 
 
 					table_str += '<td class = "' + 'all' + '" id = "tooth_' + operation_id + '">' + '-' + '</td>';
@@ -1610,10 +1617,38 @@ start:function(){
 					table_str += '<td style = "display:none" id = "previous_' + operation_id + '">' + is_prev_record + '</td>';
 					table_str += '</tr>';
 
-					console.log("selected_treatment_temp", selected_treatment_temp)
+//					console.log("selected_treatment_tempvvvvvvvvvvvvvvvvvvvv", selected_treatment_temp)
 
 					$('#progres_table').append(table_str);
 
+                    /*CHANGED HERE */
+                    $('#dignosis_code_'+operation_id).smartAutoComplete({
+                        source: dignosis_records,
+                        filter: function(term, source){
+                            alert("dfd")
+                            var filtered_and_sorted_list = [];
+                            $.each(source, function(item){
+                                if (item.includes(term)) {
+                                    filtered_and_sorted_list.push(item);
+                                }
+                            });
+
+                            return filtered_and_sorted_list;
+                        }
+                    });
+                    $('#dignosis_code_'+operation_id).bind({
+                        itemSelect: function(ev, selected_item){
+                            //get the text from selected item
+                            var selected_value = $(selected_item).text();
+                            //hide results container
+                            $(this).trigger('lostFocus');
+
+                            self.update_diag_code($(this).attr('id'), selected_value);
+                          },
+
+                    });
+
+                    /*autocomplete diag code end*/
 					$('#delete_' + operation_id).click(function() {
 						var x = window.confirm("Are you sure you want to delete?");
 						if (x) {
@@ -1709,6 +1744,7 @@ start:function(){
 					today = created_date;
 				}
 				var table_str = '';
+				var self = this;
 				this.get_treatment_charge(selected_treatment_temp.treatment_id).then(function(t_charge) {
 //					//console.log("Lineeeee 22222222222222222222222  toothpartfn")
 
@@ -1721,120 +1757,131 @@ start:function(){
 					table_str += '<tr id = operation_' + operation_id + ' style= "display:none">';
 				else
 				table_str += '<tr id = operation_' + operation_id + '>';
+				console.log("selected_treatment_temp", selected_tooth_temp)
 				table_str += '<td id = "date_time_' + operation_id + '">' + today + '</td>';
-				table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' + operation_id + '">' + selected_treatment_temp.treatment_name + '</td>';
 
-                    if (type == 'palmer') {
+				table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' +
+				              operation_id + '">' + selected_treatment_temp.treatment_name + '</td>';
 
-                        var numbers = parseInt(selected_tooth_temp);
-                            if (selected_tooth_temp == '-') {
-                                numbers = '-';
-                            }
-                        switch(numbers) {
-                        case 1:
-                            table_str += '<td class="' + selected_tooth_temp + '" id = "tooth_' + operation_id + '">' + Palmer[1] + '</td>';
-                            break;
-                        case 2:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[2] + '</td>';
-                            break;
-                        case 3:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[3] + '</td>';
-                            break;
-                        case 4:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[4] + '</td>';
-                            break;
-                        case 5:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[5] + '</td>';
-                            break;
-                        case 6:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[6] + '</td>';
-                            break;
-                        case 7:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[7] + '</td>';
-                            break;
-                        case 8:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[8] + '</td>';
-                            break;
-                        case 9:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[9] + '</td>';
-                            break;
-                        case 10:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[10] + '</td>';
-                            break;
-                        case 11:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[11] + '</td>';
-                            break;
-                        case 12:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[12] + '</td>';
-                            break;
-                        case 13:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[13] + '</td>';
-                            break;
-                        case 14:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[14] + '</td>';
-                            break;
-                        case 15:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[15] + '</td>';
-                            break;
-                        case 16:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[16] + '</td>';
-                            break;
-                        case 17:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[17] + '</td>';
-                            break;
-                        case 18:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[18] + '</td>';
-                            break;
-                        case 19:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[19] + '</td>';
-                            break;
-                        case 20:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[20] + '</td>';
-                            break;
-                        case 21:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[21] + '</td>';
-                            break;
-                        case 22:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[22] + '</td>';
-                            break;
-                        case 23:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[23] + '</td>';
-                            break;
-                        case 24:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[24] + '</td>';
-                            break;
-                        case 25:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[25] + '</td>';
-                            break;
-                        case 26:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[26] + '</td>';
-                            break;
-                        case 27:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[27] + '</td>';
-                            break;
-                        case 28:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[28] + '</td>';
-                            break;
-                        case 29:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[29] + '</td>';
-                            break;
-                        case 30:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[30] + '</td>';
-                            break;
-                        case 31:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[31] + '</td>';
-                            break;
-                        case 32:
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[32] + '</td>';
-                            break;
-                        case '-':
-                            table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + '-' + '</td>';
-                            break;
+				table_str += '<td id = "dignosis_' + operation_id + '">'+
+				            '<input class="diagnosis_code" type="text" id="dignosis_code_'+operation_id+'" />'+
+				            '</td>';
+				table_str += '<td id = "dignosis_note_td' + operation_id + '">' +
+				                '<input type="text" id="dignosis_note_'+operation_id+'"></input>'+
+				                 '</td>';
 
+                if (type == 'palmer') {
+
+                    var numbers = parseInt(selected_tooth_temp);
+                        if (selected_tooth_temp == '-') {
+                            numbers = '-';
                         }
-                    } else if (type == 'universal') {
-                        table_str += '<td class = "' + selected_tooth_temp + '" id = "tooth_' + operation_id + '">' + selected_tooth_temp + '</td>';
-                    } else if (type == 'iso') {
+                    switch(numbers) {
+                    case 1:
+                        table_str += '<td class="' + selected_tooth_temp + '" id = "tooth_' + operation_id + '">' + Palmer[1] + '</td>';
+                        break;
+                    case 2:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[2] + '</td>';
+                        break;
+                    case 3:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[3] + '</td>';
+                        break;
+                    case 4:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[4] + '</td>';
+                        break;
+                    case 5:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[5] + '</td>';
+                        break;
+                    case 6:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[6] + '</td>';
+                        break;
+                    case 7:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[7] + '</td>';
+                        break;
+                    case 8:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[8] + '</td>';
+                        break;
+                    case 9:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[9] + '</td>';
+                        break;
+                    case 10:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[10] + '</td>';
+                        break;
+                    case 11:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[11] + '</td>';
+                        break;
+                    case 12:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[12] + '</td>';
+                        break;
+                    case 13:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[13] + '</td>';
+                        break;
+                    case 14:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[14] + '</td>';
+                        break;
+                    case 15:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[15] + '</td>';
+                        break;
+                    case 16:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[16] + '</td>';
+                        break;
+                    case 17:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[17] + '</td>';
+                        break;
+                    case 18:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[18] + '</td>';
+                        break;
+                    case 19:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[19] + '</td>';
+                        break;
+                    case 20:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[20] + '</td>';
+                        break;
+                    case 21:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[21] + '</td>';
+                        break;
+                    case 22:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[22] + '</td>';
+                        break;
+                    case 23:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[23] + '</td>';
+                        break;
+                    case 24:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[24] + '</td>';
+                        break;
+                    case 25:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[25] + '</td>';
+                        break;
+                    case 26:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[26] + '</td>';
+                        break;
+                    case 27:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[27] + '</td>';
+                        break;
+                    case 28:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[28] + '</td>';
+                        break;
+                    case 29:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[29] + '</td>';
+                        break;
+                    case 30:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[30] + '</td>';
+                        break;
+                    case 31:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[31] + '</td>';
+                        break;
+                    case 32:
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + Palmer[32] + '</td>';
+                        break;
+                    case '-':
+                        table_str += '<td  class="' + selected_tooth_temp + '"id = "tooth_' + operation_id + '">' + '-' + '</td>';
+                        break;
+
+                    }
+                }
+                else if (type == 'universal') {
+                    table_str += '<td class = "' + selected_tooth_temp + '" id = "tooth_' + operation_id + '">' + selected_tooth_temp + '</td>';
+                } else if (type == 'iso') {
                         var numbers = parseInt(selected_tooth_temp);
 
                         switch(numbers) {
@@ -1949,8 +1996,36 @@ start:function(){
 				table_str += '<td style = "display:none" id = "previous_' + operation_id + '">' + is_prev_record + '</td>';
 				table_str += '</tr>';
 
-					console.log("selected_treatment_temp222222222", selected_treatment_temp)
-					$('#progres_table').append(table_str);
+//                console.log("selected_treatment_temp222222222", selected_treatment_temp)
+                $('#progres_table').append(table_str);
+
+				/*CHANGED HERE */
+				$('#dignosis_code_'+operation_id).smartAutoComplete({
+					source: dignosis_records,
+					filter: function(term, source){
+					    var filtered_and_sorted_list = [];
+						$.each(source, function(item){
+                            if (item.includes(term)) {
+                                filtered_and_sorted_list.push(item);
+                            }
+                        });
+
+                        return filtered_and_sorted_list;
+                    }
+			    });
+                $('#dignosis_code_'+operation_id).bind({
+					itemSelect: function(ev, selected_item){
+					    //get the text from selected item
+                        var selected_value = $(selected_item).text();
+                        //hide results container
+                        $(this).trigger('lostFocus');
+
+                        self.update_diag_code($(this).attr('id'), selected_value);
+                      },
+
+			  	});
+
+				/*autocomplete diag code end*/
 
 					$('#delete_' + operation_id).click(function() {
 						var x = window.confirm("Are you sure you want to delete?");
@@ -2019,7 +2094,7 @@ start:function(){
 							status_defined,
 							created_date,
 							is_prev_record, other_history,
-							dignosis,dignosis_note) {
+							dignosis,dignosis_description) {
 //            //console.log("inside put_data")
 //			//console.log("SUrfacesssssssssssss   ,selected_surface_temp,tooth_by_part  ",surfaces, selected_surface_temp, tooth_by_part)
 
@@ -2071,81 +2146,20 @@ start:function(){
 
 				/*Change starts here*/
                 /*autocomplete diag code start*/
+                var d_code_data = dignosis_records_by_id[dignosis.id];
+                var desc_data = "";
+                if (dignosis_description && dignosis_description != 'false') {
+                    desc_data = dignosis_description;
+                }
                 table_str += '<td id="dignosis_' + operation_id +
 								'"><input class="diagnosis_code" id="dignosis_code_' +
-								operation_id + '">' + '</input></td>';
+								operation_id + '" value="' + d_code_data.code+'/'+ d_code_data.description+'"/></td>';
                 table_str += '<td id = "dignosis_note_td' + operation_id +
 								'"><input class="dignosis_note" autocomplete="off" id="dignosis_note_' +
-								operation_id + '">' + '</input></td>';
+								operation_id + '" value="'+ desc_data +'"/></td>';
 
 
                 /*autocomplete diag code end*/
-
-
-				/*diagnosis code start ----------old*/
-				/*if (status_defined != 'completed') {
-					if (dignosis) {
-						if (dignosis.id) {
-							var html;
-							for (var i = 0; i < dignosis_records[0].length; i++) {
-								if (i == (dignosis.id - 1)) {
-									html += '<option value = "' + dignosis_records[0][i].id + '" selected="selected">' +
-										dignosis_records[0][i].code + '</option>';
-								}
-								else {
-									html += '<option value = "' + dignosis_records[0][i].id + '" >' +
-										dignosis_records[0][i].code + '</option>';
-								}
-							}
-							table_str += '<td id = "dignosis_' + operation_id +
-								'"><select id = "dignosis_code_' +
-								operation_id + '">' + html + '</select></td>';
-						}
-						else {
-							var html;
-							for (var i = 0; i < dignosis_records[0].length; i++) {
-								html += '<option value = "' + dignosis_records[0][i].id +
-									'" >' + dignosis_records[0][i].code + '</option>';
-							}
-							table_str += '<td id = "dignosis_' + operation_id +
-								'"><select id = "dignosis_code_' +
-								operation_id + '">' + html + '</select></td>';
-						}
-					}
-					else {
-						var html;
-						for (var i = 0; i < dignosis_records[0].length; i++) {
-							html += '<option value = "' + dignosis_records[0][i].id +
-								'" >' + dignosis_records[0][i].code + '</option>';
-						}
-						table_str += '<td id = "dignosis_' + operation_id +
-							'"><select id = "dignosis_code_' + operation_id +
-							'">' + html + '</select></td>';
-					}
-				}
-				else {
-					table_str += '<td id = "dignosis_' + operation_id +
-						'"><select id = "dignosis_code_' + operation_id +
-						'">' + '<option value = "' + dignosis.id+'" >' +
-						dignosis.code+'</option>' + '</select></td>';
-				}*/
-				/*diagnosis code end*/
-
-				/*diagnosis description start*/
-				/*if (dignosis_description) {
-					table_str += '<td id = "dignosis_description_td_' + operation_id +
-						'"><input type="text" name="dignosis_description" value=' +
-						dignosis_description+' id = "dignosis_description_' +
-						operation_id + '"></td>';
-				}
-				else {
-					var blank_val = ' '
-					table_str += '<td id = "dignosis_description_td_' +
-						operation_id + '"><input type="text" name="dignosis_description" "' +
-						blank_val+'" id = "dignosis_description_' + operation_id + '"></td>';
-				}*/
-				/*diagnosis description end*/
-				/*Change ends here*/
 
 
 				if (type == 'palmer') {
@@ -2407,92 +2421,23 @@ start:function(){
                                 filtered_and_sorted_list.push(item);
                             }
                         });
-
+//                        console.log(",,,,,,,,,,,,,,,,,,,,,,,,,,,", $('#dignosis_code_'+operation_id).position())
                         return filtered_and_sorted_list;
                     }
 			    });
                 $('#dignosis_code_'+operation_id).bind({
-                    /*keyIn: function(ev){
-                        var tag_list = ev.customData.query.split(",");
-                        //pass the modified query to default event
-                        ev.customData.query = $.trim(tag_list[tag_list.length - 1]);
-                    },*/
 					itemSelect: function(ev, selected_item){
 					    //get the text from selected item
                         var selected_value = $(selected_item).text();
-                        console.log("eeeeeeee", selected_value)
                         //hide results container
                         $(this).trigger('lostFocus');
 
                         self.update_diag_code($(this).attr('id'), selected_value);
-                        /*
-
-
-                        var cur_list = $(this).val().split(",");
-                        cur_list[cur_list.length - 1] = selected_value;
-//                      $(this).val(cur_list.join(",") + ",");
-                        $('#dignosis_code_'+operation_id).text('fffffffff');
-                        //set item selected property
-                        options.setItemSelected(true);
-
-                        //hide results container
-                        $(this).trigger('lostFocus');
-
-                        //prevent default event handler from executing
-                        ev.preventDefault();*/
                       },
 
 			  	});
-				/*autocomplete diag code start*/
-				/*function split(val) {
-                    return val.split(/,\s*!/);
-                }
-                function extractLast(term) {
-                    return split(term).pop();
-                }
-				$('.diagnosis_code').autocomplete({
-                    select: function (event, ui) {
-                        console.log("tttttttttt", event, ui)
-                        var terms = split(this.value);
-                        // remove the current input
-                        terms.pop();
-                        // add the selected item
 
-                        terms.push(ui.item.label);
-                        this.value = terms;
-
-//                        $(this).attr('data-id', ui.item.value);
-                        return false;
-                    },
-                    source: function (request, response) {
-                        var res = $.map(dignosis_records, function(item) {
-                            if (item.label.includes(request.term)) {
-                                return item;
-                            }
-                            else {
-                                return;
-                            }
-                        });
-                        response(res);
-                    }
-                });*/
 				/*autocomplete diag code end*/
-				/*$('#dignosis_code_' + operation_id).change(function () {
-//				    $(this).attr('data-id', );
-				});*/
-
-//				DIAGNOSIS CODE ONCHANGE START
-				/*$('#dignosis_code_' + operation_id).change(function () {
-					var ops_id = $(this)[0].id.split('dignosis_code_')[1];
-					rpc.query({
-		                model: 'diagnosis',
-		                method: 'get_dignosis_description',
-		                args: [parseInt($('#dignosis_code_' + ops_id).val())],
-		            }).then(function (res) {
-		            	$('#dignosis_description_' + ops_id)[0].value = res;
-		           });
-			    });*/
-				/*DIAGNOSIS CODE ONCHANGE END*/
 				$('#delete_' + operation_id).click(function() {
 					var x = window.confirm("Are you sure you want to delete?");
 					if (x) {
@@ -2654,6 +2599,7 @@ start:function(){
             	        value: res[i]['id']
             	    };*/
 					dignosis_records[res[i]['code'] + '/' + res[i]['description']] = res[i];
+					dignosis_records_by_id[res[i]['id']] = res[i];
 				}
             });
 		},
