@@ -6,7 +6,7 @@ class PatientRegistration(models.TransientModel):
     _name = 'patient.registration'
 
     patient_id = fields.Many2one('medical.patient', 'Patient')
-    nationality_id = fields.Many2one('medical.nationality', 'Nationality')
+    nationality_id = fields.Many2one('patient.nationality', 'Nationality')
     name_tag = fields.Selection([('Mr.', 'Mr.'),
                                  ('Mrs.', 'Mrs.'),
                                  ('Miss', 'Miss'),
@@ -76,9 +76,9 @@ class PatientRegistration(models.TransientModel):
     q47 = fields.Selection([('YES', 'YES'), ('NO', 'NO')], 'Have you ever had any serious trouble?')
     q48 = fields.Selection([('YES', 'YES'), ('NO', 'NO')], 'Are you taking any anticoagulants (blood thinner) ? ')
     q49 = fields.Date('Date of Last Dental Visit?')
-    q50 = fields.Boolean('Brushing')
-    q51 = fields.Boolean('Flossing')
-    q52 = fields.Boolean('Mouthwash')
+    q50 = fields.Char('Brushing')
+    q51 = fields.Char('Flossing')
+    q52 = fields.Char('Mouthwash')
     q53 = fields.Selection([('YES', 'YES'), ('NO', 'NO')], 'Have you been treated for gum disease?')
     q54 = fields.Selection([('YES', 'YES'), ('NO', 'NO')], 'Have you had any dental radiographs?')
     q55 = fields.Char('When and where')
@@ -267,6 +267,8 @@ class PatientRegistration(models.TransientModel):
                                                                        "YJjc7dbLCBAgQIDAnIBhMleZwAQIECBA4K6AYXK3Wy8jQ" \
                                                                        "IAAAQJzAv8A4B4MlzhRUicAAAAASUVORK5CYII=":
             vals['register_signature'] = self.register_signature
+        if self.nationality_id:
+            vals['nationality_id'] = self.nationality_id.id
         if self.register_date:
             del vals['register_date']
             vals['updated_date'] = self.register_date

@@ -27,6 +27,69 @@ class PrescriptionLine(models.Model):
     ], 'Duration Unit', default='days', )
     note = fields.Char('Description')
 
+    @api.model
+    def create(self, values):
+        line = super(PrescriptionLine, self).create(values)
+        msg = "<b> Created New Prescription Line:</b><ul>"
+        if values.get('medicine_id'):
+            msg += "<li>" + _("Medicine") + ": %s<br/>" % (line.medicine_id.name)
+        if values.get('common_dosage'):
+            msg += "<li>" + _("Frequency") + ": %s  <br/>" % (line.common_dosage.name)
+        if values.get('duration'):
+            msg += "<li>" + _("Duration") + ": %s  <br/>" % (line.duration)
+        if values.get('duration_period'):
+            msg += "<li>" + _("Duration Unit") + ": %s  <br/>" % (line.duration_period)
+        if values.get('note'):
+            msg += "<li>" + _("Description") + ": %s  <br/>" % (line.note)
+        msg += "</ul>"
+        line.appt_id.message_post(body=msg)
+        return line
+
+    @api.multi
+    def write(self, values):
+        appoints = self.mapped('appt_id')
+        for apps in appoints:
+            order_lines = self.filtered(lambda x: x.appt_id == apps)
+            msg = "<b> Updated Prescription Line :</b><ul>"
+            for line in order_lines:
+                if values.get('medicine_id'):
+                    msg += "<li>" + _("Medicine") + ": %s -> %s <br/>" % (
+                    line.medicine_id.name, self.env['medical.medicine.prag'].browse(values['medicine_id']).name,)
+                if values.get('common_dosage'):
+                    msg += "<li>" + _("Frequency") + ": %s -> %s <br/>" % (line.common_dosage.name,
+                                                                           self.env['medical.medication.dosage'].browse(
+                                                                               values['common_dosage']).name,)
+                if values.get('duration'):
+                    msg += "<li>" + _("Duration") + ": %s -> %s <br/>" % (line.duration, values['duration'],)
+                if values.get('duration_period'):
+                    msg += "<li>" + _("Duration Unit") + ": %s -> %s <br/>" % (
+                    line.duration_period, values['duration_period'],)
+                if values.get('note'):
+                    msg += "<li>" + _("Description") + ": %s -> %s <br/>" % (line.note, values['note'],)
+            msg += "</ul>"
+            apps.message_post(body=msg)
+        result = super(PrescriptionLine, self).write(values)
+        return result
+
+    @api.multi
+    def unlink(self):
+        for rec in self:
+            msg = "<b> Deleted Prescription Line with Values:</b><ul>"
+            if rec.medicine_id:
+                msg += "<li>" + _("Medicine") + ": %s <br/>" % (rec.medicine_id.name,)
+            if rec.common_dosage:
+                msg += "<li>" + _("Frequency") + ": %s  <br/>" % (rec.common_dosage.name,)
+            if rec.duration:
+                msg += "<li>" + _("Duration") + ": %s  <br/>" % (rec.duration,)
+            if rec.duration_period:
+                msg += "<li>" + _("Duration Unit") + ": %s  <br/>" % (rec.duration_period,)
+            if rec.note:
+                msg += "<li>" + _("Description") + ": %s  <br/>" % (rec.note,)
+            msg += "</ul>"
+            rec.appt_id.message_post(body=msg)
+            line = super(PrescriptionLine, rec).unlink()
+        return line
+
 
 class PrescriptionReport(models.AbstractModel):
     _name = 'report.pragtech_dental_management.prescription_report_pdff'
@@ -45,6 +108,8 @@ class PrescriptionReport(models.AbstractModel):
         record['patient'] = patient
         # record['patient'] = appt.patient_name or ''
         record['doctor'] = appt.doctor.name.name
+        record['speciality'] = appt.doctor.speciality.name
+        record['license_code'] = appt.doctor.license_code
         record['date'] = appt.appointment_sdate[:10]
         prescriptions = []
         for pres in appt.prescription_ids:

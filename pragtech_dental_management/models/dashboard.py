@@ -44,6 +44,7 @@ class MedicalDashboard(models.Model):
             'type': 'ir.actions.act_window',
             'domain': [('id', 'in', appointment_ids.ids)],
             'views': [(tree_view_id, 'tree'), (form_view_id, 'form')],
+            'context': {'search_default_today': 1}
         }
 
     @api.multi

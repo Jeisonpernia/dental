@@ -5,8 +5,8 @@ from odoo.exceptions import ValidationError
 class PatientFeedbackPopup(models.TransientModel):
     _name = 'patient.feedback.wizard'
 
-    patient_id = fields.Many2one('medical.patient', 'Patient')
-    name = fields.Char("Provider")
+    patient_id = fields.Many2one('medical.patient', 'Patient', required=True)
+    name = fields.Many2one('medical.physician', 'Attended Doctor')
     language = fields.Selection([('english', 'English'),
                                  ('arabic', 'Arabic')], 'Language', required=True, default='english')
     feedback_date = fields.Date('Date', default=fields.Date.context_today, required=True)
@@ -52,15 +52,17 @@ class PatientFeedbackPopup(models.TransientModel):
         vals = self.read()[0]
         if self.patient_id:
             vals['patient_id'] = self.patient_id.id
+        if self.name:
+            vals['name'] = self.name.id
         feedback_obj.create(vals)
 
 
 class PatientFeedback(models.Model):
     _name = 'patient.feedback'
 
+    name = fields.Many2one('medical.physician', 'Attended Doctor')
     feedback_id = fields.Char("Ref", readonly=True,default=lambda self: _('New'))
     patient_id = fields.Many2one('medical.patient', 'Patient')
-    name = fields.Char("Provider")
     language = fields.Selection([('english', 'English'),
                                  ('arabic', 'Arabic')], 'Language', required=True, default='english')
     feedback_date = fields.Date('Date', default=fields.Date.context_today, required=True)

@@ -21,7 +21,7 @@ class OperationSummary(models.Model):
     appt_id = fields.Many2one('medical.appointment', 'Appointment ID')
     teeth_code_rel = fields.Many2many('teeth.code', 'teeth_code_medical_teeth_treatment_rel', 'operation', 'teeth')
     diagnosis_id = fields.Many2one('diagnosis', 'Diagnosis', default=_default_dignose)
-    diagnosis_description = fields.Text('Diagnosis Description')
+    diagnosis_description = fields.Text('Notes')
 
 
 

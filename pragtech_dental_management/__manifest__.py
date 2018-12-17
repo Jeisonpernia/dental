@@ -7,12 +7,12 @@
     'sequence': 2,
     'category': 'Generic Modules/Others',
     'depends': ['base', 'website', 'sale_management', 'purchase', 'account', 'product', 'account_invoicing',
-                'document', 'google_calendar', 'product_expiry', 'web',
+                'document', 'google_calendar', 'product_expiry', 'web', 'report_letterhead',
 
                 'web_domain_field',
                 'web_notify',
                 'web_digital_sign',
-                # 'web_tree_image',
+                'web_tree_image',
                 ],
     'description': """
 This modules includes Medical Management Features

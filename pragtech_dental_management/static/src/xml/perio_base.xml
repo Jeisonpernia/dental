@@ -73,7 +73,7 @@
         <script type="text/javascript" src="/pragtech_dental_management/static/src/js/jquery.imagemapster.js"></script>
 		<script type="text/javascript" src="/pragtech_dental_management/static/src/js/teeth_selection.js"></script>
 		<script type="text/javascript" src="/pragtech_dental_management/static/src/js/childchart_action.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
 
 
 
@@ -423,7 +423,7 @@
 									Diagnosis Code
 								</td>
 								<td>
-									Diagnosis Note
+									Note
 								</td>
 								<td>
 									Tooth
@@ -444,6 +444,8 @@
 									Action
 								</td>
 								<td style = "background:white" class = "delete_td">
+								</td>
+								<td style = "background:white" class = "copy_td">
 								</td>
 								<td style = "display:none">
 									Previous Record

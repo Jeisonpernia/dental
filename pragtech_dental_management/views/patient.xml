@@ -42,7 +42,7 @@
 
 				</group>
 				<group col="2" colspan="2" string="Picture" rowspan="1">
-					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120"/>
+					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120" widget="image"/>
 				</group>
 				</group>
 				<notebook>
@@ -399,12 +399,29 @@
                                 <td>
                                     <label for="q50" string="How often do you brush/floss?"/>
                                 </td>
-                                <td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
                                     <label for="q50"/>
+                                </td>
+                                <td>
                                     <field name="q50"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
                                     <label for="q51"/>
+                                </td>
+                                <td>
                                     <field name="q51"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
                                     <label for="q52"/>
+                                </td>
+                                <td>
                                     <field name="q52"/>
                                 </td>
                             </tr>
@@ -606,7 +623,7 @@
 				        </group>
 			        </page>
 			        <page string="Chart" autofocus="autofocus">
-			        	<button name="open_chart" default_focus="1" type="object" string="Open Chart"></button>
+			        	<button name="open_chart" groups="pragtech_dental_management.group_dental_doc_menu,pragtech_dental_management.group_dental_mng_menu" default_focus="1" type="object" string="Open Chart"></button>
 			        </page>
 			        <page string="Operations">
                         <group colspan="4" col="8" >

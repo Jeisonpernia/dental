@@ -9,16 +9,16 @@
 					<group>
 						<group>
 							<field name="language" string="Language/لغة"/>
-							<field name="name" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
-							<field name="name" string="مزود"
+							<field name="patient_id" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
+							<field name="patient_id" string="اسم المريض"
 								   attrs="{'invisible': [('language', '=', 'english')]}"/>
 						</group>
 						<group>
 							<field name="feedback_date" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
 							<field name="feedback_date" string="تاريخ"
 								   attrs="{'invisible': [('language', '=', 'english')]}"/>
-							<field name="patient_id" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
-							<field name="patient_id" string="صبور"
+							<field name="name" options="{'no_create': True, 'no_create_edit':True}" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
+							<field name="name" options="{'no_create': True, 'no_create_edit':True}" string="حضر الطبيب"
 								   attrs="{'invisible': [('language', '=', 'english')]}"/>
 						</group>
 					</group>
@@ -166,7 +166,9 @@
 					    </tr>
 					</table>
 					<br/>
-					<p><strong>Please take a moment to write your comments below.</strong></p>
+					<p attrs="{'invisible': [('language', '=', 'arabic')]}"><strong>Please take a moment to write your comments below.</strong></p>
+					<p  style="text-align: right;" attrs="{'invisible': [('language', '=', 'english')]}"><strong>يرجى قضاء بعض الوقت في كتابة تعليقاتك أدناه.
+</strong></p>
 					<field name="comments"/>
 
                   <footer>

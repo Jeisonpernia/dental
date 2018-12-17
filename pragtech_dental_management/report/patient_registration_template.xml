@@ -1,7 +1,7 @@
 <odoo>
     <template id="report_registration_pdf">
         <t t-call="web.html_container">
-        <t t-call="web.external_layout">
+        <t t-call="web.internal_new_layout">
             <t t-foreach="docs" t-as="o">
                 <div class="page">
                     <div class="text-center">
@@ -489,8 +489,9 @@
                                 <td><t t-esc="o.q29"/></td>
                             </tr>
                             <tr  t-if="o.q29 == 'YES'">
-                                <td><t t-esc="o.q30"  placeholder="When...."/></td>
-                                <td></td>
+                                <td><strong><span>When ...</span></strong></td>
+                                <td><t t-esc="o.q30"/></td>
+
                             </tr>
                             <tr>
                                 <td>
@@ -499,7 +500,7 @@
                                 <td><t t-esc="o.q31"/></td>
                             </tr>
                             <tr  t-if="o.q31 == 'YES'">
-                                <td><t t-esc="o.q32"  placeholder="Please specify...."/></td>
+                                <td><t t-esc="o.q32"/></td>
                                 <td></td>
                             </tr>
                         </table>
@@ -678,30 +679,30 @@
                                 <td>
                                     <strong><span>How often do you brush/floss?</span></strong>
                                 </td>
+                                <td></td>
+                            </tr>
+                            <tr>
                                 <td>
                                     <strong><span>Brushing</span></strong>
-                                    <t t-if="o.q50">
-                                     <input type="checkbox" checked="True"/>
-                                    </t>
-                                    <t t-else="">
-                                        <input type="checkbox"/>
-                                    </t>
+                                </td>
+                                <td>
+                                    <t t-esc="o.q50"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
                                     <strong><span>Flossing</span></strong>
-
-                                    <t t-if="o.q51">
-                                     <input type="checkbox" checked="True"/>
-                                    </t>
-                                    <t t-else="">
-                                        <input type="checkbox"/>
-                                    </t>
+                                </td>
+                                <td>
+                                    <t t-esc="o.q51"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
                                     <strong><span>Mouthwash</span></strong>
-
-                                    <t t-if="o.q52">
-                                     <input type="checkbox" checked="True"/>
-                                    </t>
-                                    <t t-else="">
-                                        <input type="checkbox"/>
-                                    </t>
+                                </td>
+                                <td>
+                                    <t t-esc="o.q52"/>
                                 </td>
                             </tr>
                             <tr>
@@ -1087,7 +1088,7 @@
                             </tr>
 
                         </table>
-                        <p style="text-align: right;"><strong>هل كان لديك أي من التالي؟ (يرجى تحديد المربع)</strong></p>
+                        <p style="text-align: right;"><strong>هل كان لديك أي من التالي؟(يرجى تحديد المربع)</strong></p>
                         <table style="width:100%;">
                             <tr>
                                 <th style="width:8%;"></th>
@@ -1375,8 +1376,9 @@
                                 </td>
                             </tr>
                             <tr  t-if="o.q29 == 'YES'">
-                                <td></td>
-                                <td style="text-align: right;"><t t-esc="o.q30"  placeholder="When...."/></td>
+
+                                <td style="text-align: right;"><t t-esc="o.q30"/></td>
+                                <td><strong><span> إذا نعم متى</span></strong></td>
                             </tr>
                             <tr>
                                 <td style="text-align: right;"><t t-esc="o.q31"/></td>
@@ -1386,7 +1388,7 @@
                             </tr>
                             <tr  t-if="o.q31 == 'YES'">
                                 <td></td>
-                                <td style="text-align: right;"><t t-esc="o.q32"  placeholder="Please specify...."/></td>
+                                <td style="text-align: right;"><t t-esc="o.q32"/></td>
                             </tr>
                         </table>
                         <p style="text-align: right;"><strong>هل لديك حساسيه؟</strong></p>
@@ -1516,8 +1518,9 @@
                                 </td>
                             </tr>
                             <tr  t-if="o.q44 == 'YES'">
-                                <td></td>
-                                <td style="text-align: right;"><t t-esc="o.q45"  placeholder="Month...."/></td>
+
+                                <td style="text-align: right;"><t t-esc="o.q45"/></td>
+                                <td><strong><span>نعم الشهر</span></strong></td>
                             </tr>
                             <tr>
                                 <td style="text-align: right;"><t t-esc="o.q46"/></td>
@@ -1551,36 +1554,34 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td></td>
                                 <td style="text-align: right;">
-                                    <t t-if="o.q50">
-                                        <input type="checkbox" checked="True"/>
-                                    </t>
-                                    <t t-else="">
-                                        <input type="checkbox"/>
-                                    </t>
-                                    <strong><span>صناعة الفرش</span></strong>
-                                    <t t-if="o.q51">
-                                        <input type="checkbox" checked="True"/>
-                                    </t>
-                                    <t t-else="">
-                                        <input type="checkbox"/>
-                                    </t>
+                                    <strong><span>كم مرة تقوم بالفرشاة / الخيط؟</span></strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <t t-esc="o.q50"/>
+                                </td>
+                                <td style="text-align: center;">
+                                    <strong><span>تنظيف</span></strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <t t-esc="o.q51"/>
+                                </td>
+                                <td style="text-align: center;">
                                     <strong><span>الخيط</span></strong>
-
-                                    <t t-if="o.q52">
-                                        <input type="checkbox" checked="True"/>
-                                    </t>
-                                    <t t-else="">
-                                        <input type="checkbox"/>
-                                    </t>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <t t-esc="o.q52"/>
+                                </td>
+                                <td style="text-align: center;">
                                     <strong><span>غسول الفم</span></strong>
-
                                 </td>
-                                <td style="text-align: right;">
-                                    <strong><span>كم مرة تقومين بالفرشاة / الخيط؟</span></strong>
-
-                                </td>
-
                             </tr>
                             <tr>
                                 <td style="text-align: right;"><t t-esc="o.q53"/></td>
@@ -1595,8 +1596,9 @@
                                 </td>
                             </tr>
                             <tr  t-if="o.q54 == 'YES'">
-                                <td></td>
-                                <td style="text-align: right;"><t t-esc="o.q55"  placeholder="When and where...."/></td>
+
+                                <td style="text-align: right;"><t t-esc="o.q55"/></td>
+                                <td><strong><span>متى و أين</span></strong></td>
                             </tr>
                             <tr>
                                 <td style="text-align: right;"><t t-esc="o.q56"/></td>
@@ -1822,8 +1824,8 @@
                                 </td>
                             </tr>
                             <tr  t-if="o.q76 == 'YES'">
-                                <td></td>
-                                <td style="text-align: right;"><t t-esc="o.q77"  placeholder="If no, Please explain...."/></td>
+                                <td style="text-align: right;"><t t-esc="o.q77"/></td>
+                                <td><strong><span>إذا كان الجواب لا ، فيرجى التوضيح</span></strong></td>
                             </tr>
                         </table>
 

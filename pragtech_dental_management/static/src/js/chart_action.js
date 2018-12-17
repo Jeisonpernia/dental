@@ -44,7 +44,8 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 	var other_patient_history = new Array();
 	/*CHANGED HERE*/
 //	var dignosis_records = new Array();
-	var dignosis_records = {};
+	var dignosis_records = [];
+	/*will be useful for autocomplete*/
 	var dignosis_records_by_id = {};
 
 	var self_var;
@@ -57,6 +58,13 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 
 	//Chart Selection Check
 	var type = '';
+
+	function split(val) {
+		return val.split(/,\s*/);
+	}
+	function extractLast(term) {
+		return split(term).pop();
+	}
 
 	var DentalChartView = Widget.extend({
 		template : "DentalChartView",
@@ -832,7 +840,12 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 											    var found_selected_tooth;
 												if (full_mouth_selected == 1) {
 //                                                  //console.log('inside fullmouthcall');
-													self.put_data_full_mouth(self, full_mouth_teeth, full_mouth_selected, each_treatment, 'planned','Full_mouth',false, false, false);
+													/*added argument for amount*/
+													self.put_data_full_mouth(self, full_mouth_teeth,
+														full_mouth_selected, each_treatment,
+														'planned','Full_mouth',
+														false, false, false, false, false, false);
+
 													full_mouth_selected = 0;
 													return;
 												}
@@ -841,7 +854,12 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
                                                     for (var select_up_tooth = 1; select_up_tooth <= 16; select_up_tooth++) {
                                                     upper_mouth.push(select_up_tooth);}
 //												    //console.log('inside uppermouthcall');
-													self.put_data_full_mouth(self, upper_mouth, upper_mouth_selected, each_treatment, 'planned', 'Upper_Jaw',false, false, false);
+													/*added argument amount*/
+													self.put_data_full_mouth(self, upper_mouth,
+														upper_mouth_selected, each_treatment,
+														'planned', 'Upper_Jaw',false,
+														false, false, false, false, false);
+
 													upper_mouth_selected = 0;
 													return;
 												}
@@ -849,8 +867,15 @@ odoo.define('pragtech_dental_management.chart_action', function(require) {
 												    var lower_mouth = new Array();
                                                     for (var select_up_tooth = 1; select_up_tooth <= 16; select_up_tooth++) {
                                                     lower_mouth.push(select_up_tooth);}
-//												    //console.log('inside lower_mouthcall');
-													self.put_data_full_mouth(self, lower_mouth, lower_mouth_selected, each_treatment, 'planned','Lower_Jaw',false, false, false);
+													/*add argument for amount*/
+													self.put_data_full_mouth(self, lower_mouth,
+														lower_mouth_selected,
+														each_treatment,
+														'planned', 'Lower_Jaw',
+														false, false, false,
+														false, false, false
+													);
+
 													lower_mouth_selected = 0;
 													return;
 												}
@@ -1075,12 +1100,24 @@ start:function(){
 						each_operation['tooth_id'], false,
 						each_operation['status'], each_operation['created_date'],
 						is_prev_record_from_write, each_operation['other_history'],
-						each_operation['dignosis'],each_operation['dignosis_description']
+						each_operation['dignosis'],each_operation['dignosis_description'],
+						each_operation['amount']
 					);
 				}
 				else {
-//				//console.log("reached line 1048........before putting in page")
-					self_var.put_data_full_mouth(self_var, each_operation.multiple_teeth, 1, selected_treatment, each_operation['status'],each_operation['surface'], each_operation['created_date'], is_prev_record_from_write, each_operation['other_history']);
+//					console.log("reached line 1048........before putting in page",each_operation)
+					/*added amount to the argument list*/
+					self_var.put_data_full_mouth(self_var, each_operation.multiple_teeth,
+						1, selected_treatment,
+						each_operation['status'],
+						each_operation['surface'],
+						each_operation['created_date'],
+						is_prev_record_from_write,
+						each_operation['other_history'],
+						each_operation['dignosis'],
+						each_operation['dignosis_description'],
+						each_operation['amount']
+					);
 
 				}
 			});
@@ -1174,29 +1211,30 @@ start:function(){
                                 });
                 });
 
-
+				/*change amount field to readonly based on status*/
                 self.$('.myButton').click(function() {
-				var current_obj = this;
-				var found = $('.selected_operation').find('.progress_table_actions');
-				_.each(found, function(each_found) {
-					if (each_found.innerText != 'missing') {
-						var actual_id = each_found.id.substr(7);
+					var current_obj = this;
+					var found = $('.selected_operation').find('.progress_table_actions');
+					_.each(found, function(each_found) {
+						if (each_found.innerText != 'missing') {
+							var actual_id = each_found.id.substr(7);
 
-						if ($('#status_'+actual_id).attr('status_name') != 'completed') {
-							$('#status_'+actual_id).attr('status_name', current_obj.id)
-							$('#status_'+actual_id)[0].innerHTML = (current_obj.innerHTML).trim();
+							if ($('#status_'+actual_id).attr('status_name') != 'completed') {
+								$('#status_'+actual_id).attr('status_name', current_obj.id)
+								$('#status_'+actual_id)[0].innerHTML = (current_obj.innerHTML).trim();
+								$('#amount_'+actual_id+' input').attr('readonly', true);
 
+							}
+							else if($('#status_'+actual_id).attr('status_name') == 'completed') {
+								$('#status_'+actual_id)[0].innerHTML = $('#completed').text().trim();
+							}
 						}
-						else if($('#status_'+actual_id).attr('status_name') == 'completed') {
-							$('#status_'+actual_id)[0].innerHTML = $('#completed').text().trim();
-						}
+					});
+					if (!found.length) {
+						alert('Please select a record!')
 					}
-				});
-				if (!found.length) {
-					alert('Please select a record!')
-				}
 
-			});
+				});
 
 			self.$('#heading').click(function() {
 				var found = self.$el.find('.selected_operation');
@@ -1324,11 +1362,12 @@ start:function(){
                         var all_teeth = op_id.className;
 						var values = [];
 						var vals = [];
+						var amount = $('#amount_' + op + ' input').val();
 
 						/*CHANGED HERE */
-						var dignosis_code = $('#dignosis_code_' + op)[0].value;
-						console.log($('#dignosis_note_' + op), "ddddddddddddddd", dignosis_code)
-						var d_code = dignosis_code ? dignosis_records[dignosis_code].id : null;
+						var dignosis_code = $('#dignosis_code_' + op).attr('data-id');
+						//console.log($('#dignosis_note_' + op), "ddddddddddddddd", dignosis_code)
+						//var d_code = dignosis_code ? dignosis_records[dignosis_code].id : null;
 
 						var dignosis_note = $('#dignosis_note_' + op)[0].value;
 
@@ -1343,6 +1382,7 @@ start:function(){
 						values.push(categ_list);
 						var actual_tooth = String(teeth_id.id);
 //						//console.log("inside perform action " ,"teeth_id  document.getElementById('tooth_' + op)"+teeth_id,"tooth $('#tooth_' + op).attr('class');"+tooth,"actual_tooth = String(teeth_id.id);"+actual_tooth);
+						/*passing amount to the backend for updating to the database*/
 						treatment_lines_2.push({
 							'status' : String(status_id.innerHTML),
 							'status_name' : status_name,
@@ -1351,12 +1391,13 @@ start:function(){
 							'values' : categ_list,
 							'prev_record' : prev_record.innerHTML,
 							'multiple_teeth' : all_teeth,
-							'dignosis_code': d_code ? d_code : null,
-							'dignosis_description': dignosis_note
+							'dignosis_code': dignosis_code ? dignosis_code : null,
+							'dignosis_description': dignosis_note,
+							'amount': amount ? amount : false
 						});
 
-//						//console.log("Treatment lines printing ---------------")
-//						//console.log(treatment_lines_2);
+						//console.log("Treatment lines printing ---------------")
+						//console.log(treatment_lines_2);
 
 					}
 				}
@@ -1442,7 +1483,7 @@ start:function(){
 						selected_tooth_temp,
 						selected_surface_temp, 'planned',
 						false, false,
-						false,false,false
+						false,false,false,false
 					);
 				} else {
 					var treatment_present = 0;
@@ -1464,7 +1505,7 @@ start:function(){
 									selected_surface_temp,
 									false, false,
 									false, false,
-									false, false
+									false, false, false
 								);
 							}
 						}
@@ -1482,7 +1523,7 @@ start:function(){
 						surfaces, selected_tooth_temp,
 						false, false,
 						false, false,
-						false, false
+						false, false, false
 					);
 				} else {
 				        record['treatments'].push(d);
@@ -1496,7 +1537,7 @@ start:function(){
 						this.put_data(self_var, surfaces,
 							selected_tooth_temp, '',
 							'planned', false, false,
-							false, false
+							false, false, false
 						);
 
 
@@ -1541,7 +1582,7 @@ start:function(){
 									   full_mouth, selected_treatment_temp,
 									   status_to_define, mouth_part,
 									   created_date, is_prev_record,
-									   other_history) {
+									   other_history, dignosis, dignosis_description, amount) {
 			if (selected_treatment_temp.action == 'missing') {
 				self_var.perform_missing_action(full_mouth_teeth_temp);
 			}
@@ -1574,6 +1615,11 @@ start:function(){
 					if (!t_charge) {
 						t_charge = '0.0';
 					}
+					/*the line amount may be changed from the default price */
+					if (amount) {
+						t_charge = amount;
+					}
+
 					operation_id += 1;
 					var total_teeth = '';
 					var surf_list = new Array();
@@ -1597,58 +1643,97 @@ start:function(){
 					table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' + operation_id + '">' + selected_treatment_temp.treatment_name + '</td>';
 
 					/*CHANGED HERE - added below line*/
-					table_str += '<td id = "dignosis_' + operation_id + '"><input ' +
-						'class="diagnosis_code" id = "dignosis_code_' + operation_id + '">' +
-						'></td>';
-                    table_str += '<td id = "dignosis_' + operation_id + '"><input ' +
-						'class="diagnosis_note" id = "dignosis_note_' + operation_id + '">' +
-						'/></td>';
+					/*building diagnosis code and description values*/
+					var dignosis_rec, dig_data = "", diag_desc = "", data_id="";
+					if (dignosis) {
+						try {
+							dignosis_rec = dignosis_records_by_id[dignosis.id];
+							data_id = dignosis.id;
+							dig_data += dignosis_rec.code;
+							dig_data += "/" + dignosis_rec.description;
+						}
+						catch (err) {}
+					}
 
+					if(dignosis_description) {
+						diag_desc = dignosis_description;
+					}
+					table_str += '<td id = "dignosis_' + operation_id + '"><input ' +
+						'class="diagnosis_code" id = "dignosis_code_' + operation_id + '" ' +
+						' value="'+ dig_data +'" data-id="'+ data_id +'"/>' +
+						'</td>';
+                    table_str += '<td id = "dignosis_' + operation_id + '"><input ' +
+						'class="diagnosis_note" id = "dignosis_note_' + operation_id + '" ' +
+						' value="'+ diag_desc +'"/>' +
+						'</td>';
 
 					table_str += '<td class = "' + 'all' + '" id = "tooth_' + operation_id + '">' + '-' + '</td>';
 
-					table_str += '<td id = "status_' + operation_id +'" status_name = "'+status_to_define+'">' + status_to_define_temp + '</td>';
+					table_str += '<td id = "status_' + operation_id +'" status_name = "'+status_to_define+'">' +
+					    status_to_define_temp + '</td>';
 					table_str += '<td id = "surface_' + operation_id + '">'+mouth_part+'</td>';
 
 					table_str += '<td id = "dentist_' + operation_id + '">' + user_name + '</td>';
-					table_str += '<td id = "amount_' + operation_id + '">' + t_charge + '</td>';
-					table_str += '<td class = "progress_table_actions" id = "action_' + operation_id + '">' + selected_treatment_temp.action + '</td>';
-					table_str += '<td class = "delete_td" id = "delete_' + operation_id + '">' + '<img src = "/pragtech_dental_management/static/src/img/delete.png" height = "20px" width = "20px"/>' + '</td>';
-					table_str += '<td style = "display:none" id = "previous_' + operation_id + '">' + is_prev_record + '</td>';
+
+                    /*setting up input field for amount and will be editable in planned state*/
+					var amount_input;
+					if (status_to_define_temp == 'Planned') {
+						amount_input = '<input type="text" ' +
+							' value="'+ t_charge +'" />';
+					}
+					else {
+						amount_input = '<input type="text" readonly="True"' +
+							' value="'+ t_charge +'" />';
+					}
+
+					table_str += '<td id = "amount_' + operation_id + '">' + amount_input + '</td>';
+
+					table_str += '<td class = "progress_table_actions" id = "action_' + operation_id + '">' +
+					    selected_treatment_temp.action + '</td>';
+					table_str += '<td class = "delete_td" id = "delete_' + operation_id + '">' +
+					    '<img src = "/pragtech_dental_management/static/src/img/delete.png" height = "20px" width = "20px"/>' + '</td>';
+					table_str += '<td class = "copy_td" id = "copy_' + operation_id + '">' +
+					    '<img src = "/pragtech_dental_management/static/src/img/copy.png" height = "20px" width = "20px"/>' +
+					    '</td>';
+					table_str += '<td style = "display:none" id = "previous_' +
+					    operation_id + '">' + is_prev_record + '</td>';
 					table_str += '</tr>';
 
-//					console.log("selected_treatment_tempvvvvvvvvvvvvvvvvvvvv", selected_treatment_temp)
+					//console.log("selected_treatment_tempvvvvvvvvvvvvvvvvvvvv", selected_treatment_temp)
 
 					$('#progres_table').append(table_str);
+					/*event for line selection*/
+					$('#operation_' + operation_id).click(function() {
+						var found = $('#progres_table').find('.selected_operation');
+						if (found) {
+							found.removeClass("selected_operation");
+						}
+						$(this).attr('class', 'selected_operation');
+					});
 
-                    /*CHANGED HERE */
-                    $('#dignosis_code_'+operation_id).smartAutoComplete({
-                        source: dignosis_records,
-                        filter: function(term, source){
-                            alert("dfd")
-                            var filtered_and_sorted_list = [];
-                            $.each(source, function(item){
-                                if (item.includes(term)) {
-                                    filtered_and_sorted_list.push(item);
-                                }
-                            });
 
-                            return filtered_and_sorted_list;
-                        }
-                    });
-                    $('#dignosis_code_'+operation_id).bind({
-                        itemSelect: function(ev, selected_item){
-                            //get the text from selected item
-                            var selected_value = $(selected_item).text();
-                            //hide results container
-                            $(this).trigger('lostFocus');
-
-                            self.update_diag_code($(this).attr('id'), selected_value);
-                          },
-
-                    });
+					/*CHANGED HERE */
+					/*jquery autocomplete feature for diagnosis code*/
+					$('#dignosis_code_'+operation_id).autocomplete({
+						select: function (event, ui) {
+							var terms = split(this.value);
+							// remove the current input
+							terms.pop();
+							// add the selected item
+							terms.push(ui.item.label);
+							this.value = terms;
+							$(this).attr('data-id', ui.item.value);
+							return false;
+						},
+						source: function (request, response) {
+							var res = $.ui.autocomplete.filter(
+								dignosis_records, extractLast(request.term));
+							response(res);
+						}
+					});
 
                     /*autocomplete diag code end*/
+
 					$('#delete_' + operation_id).click(function() {
 						var x = window.confirm("Are you sure you want to delete?");
 						if (x) {
@@ -1757,7 +1842,7 @@ start:function(){
 					table_str += '<tr id = operation_' + operation_id + ' style= "display:none">';
 				else
 				table_str += '<tr id = operation_' + operation_id + '>';
-				console.log("selected_treatment_temp", selected_tooth_temp)
+				//console.log("selected_treatment_temp", selected_tooth_temp)
 				table_str += '<td id = "date_time_' + operation_id + '">' + today + '</td>';
 
 				table_str += '<td class = "' + selected_treatment_temp.treatment_id + '" ' + 'id = "desc_' +
@@ -1767,7 +1852,7 @@ start:function(){
 				            '<input class="diagnosis_code" type="text" id="dignosis_code_'+operation_id+'" />'+
 				            '</td>';
 				table_str += '<td id = "dignosis_note_td' + operation_id + '">' +
-				                '<input type="text" id="dignosis_note_'+operation_id+'"></input>'+
+				                '<input type="text" id="dignosis_note_'+operation_id+'"/>'+
 				                 '</td>';
 
                 if (type == 'palmer') {
@@ -1990,17 +2075,62 @@ start:function(){
 				table_str += '<td id = "status_' + operation_id +'" status_name = "'+status_defined+'">' + status_to_use + '</td>';
                 table_str += '<td id = "surface_' + operation_id + '">' + tooth_surface + '</td>';
 				table_str += '<td id = "dentist_' + operation_id + '">' + user_name + '</td>';
-				table_str += '<td id = "amount_' + operation_id + '">' + t_charge + '</td>';
+
+				/*input textbox for amount*/
+				var amount_input;
+				if (status_to_use == 'Planned') {
+					amount_input = '<input type="text" ' +
+						' value="'+ t_charge +'" />';
+				}
+				else {
+					amount_input = '<input type="text" readonly="True"' +
+						' value="'+ t_charge +'" />';
+				}
+
+				table_str += '<td id = "amount_' + operation_id + '">' + amount_input + '</td>';
+
 				table_str += '<td class = "progress_table_actions" id = "action_' + operation_id + '">' + selected_treatment_temp.action + '</td>';
 				table_str += '<td class = "delete_td" id = "delete_' + operation_id + '">' + '<img src = "/pragtech_dental_management/static/src/img/delete.png" height = "20px" width = "20px"/>' + '</td>';
+				table_str += '<td class = "copy_td" id = "copy_' + operation_id + '">' +
+					    '<img src = "/pragtech_dental_management/static/src/img/copy.png" height = "20px" width = "20px"/>' +
+					    '</td>';
 				table_str += '<td style = "display:none" id = "previous_' + operation_id + '">' + is_prev_record + '</td>';
 				table_str += '</tr>';
 
-//                console.log("selected_treatment_temp222222222", selected_treatment_temp)
+                //console.log("selected_treatment_temp222222222", selected_treatment_temp)
                 $('#progres_table').append(table_str);
 
+				/*event for line selection*/
+				$('#operation_' + operation_id).click(function() {
+					var found = $('#progres_table').find('.selected_operation');
+					if (found) {
+						found.removeClass("selected_operation");
+					}
+					$(this).attr('class', 'selected_operation');
+				});
+
 				/*CHANGED HERE */
-				$('#dignosis_code_'+operation_id).smartAutoComplete({
+
+				$('#dignosis_code_'+operation_id).autocomplete({
+					select: function (event, ui) {
+						var terms = split(this.value);
+						// remove the current input
+						terms.pop();
+						// add the selected item
+						terms.push(ui.item.label);
+						this.value = terms;
+						$(this).attr('data-id', ui.item.value);
+						return false;
+					},
+					source: function (request, response) {
+						// delegate back to autocomplete, but extract the last term
+//                        if (reg_patient === true) {
+						var res = $.ui.autocomplete.filter(
+							dignosis_records, extractLast(request.term));
+						response(res);
+					}
+				});
+				/*$('#dignosis_code_'+operation_id).smartAutoComplete({
 					source: dignosis_records,
 					filter: function(term, source){
 					    var filtered_and_sorted_list = [];
@@ -2023,35 +2153,35 @@ start:function(){
                         self.update_diag_code($(this).attr('id'), selected_value);
                       },
 
-			  	});
+			  	});*/
 
 				/*autocomplete diag code end*/
 
-					$('#delete_' + operation_id).click(function() {
-						var x = window.confirm("Are you sure you want to delete?");
+				$('#delete_' + operation_id).click(function() {
+					var x = window.confirm("Are you sure you want to delete?");
 
-						if (x) {
+					if (x) {
 //						//console.log("inside put_data_toothpart")
-							update = false;
-							cont = false;
-							var actual_id = String(this.id).substr(7);
+						update = false;
+						cont = false;
+						var actual_id = String(this.id).substr(7);
 //							//console.log(String(this.id).substr(7))
-							actual_id = parseInt(actual_id);
-							var tabel = document.getElementById('operations');
-							var tr = document.getElementById('operation_' + actual_id);
-							var tooth = document.getElementById('tooth_' + actual_id);
+						actual_id = parseInt(actual_id);
+						var tabel = document.getElementById('operations');
+						var tr = document.getElementById('operation_' + actual_id);
+						var tooth = document.getElementById('tooth_' + actual_id);
 
-							var desc_class = $("#desc_" + actual_id).attr('class');
+						var desc_class = $("#desc_" + actual_id).attr('class');
 
-							var tooth_id = tr.className.split('_');
+						var tooth_id = tr.className.split('_');
 //                            //console.log("document.getElementById('tooth_' + actual_id);  and tooth_id in del" + tooth +','+tooth_id)
-							var status = document.getElementById('status_' + actual_id);
-							var status_name = $(status).attr('status_name')
-							if (status_name == 'completed' || status_name == 'in_progress') {
-								alert('Cannot delete');
-							} else {
+						var status = document.getElementById('status_' + actual_id);
+						var status_name = $(status).attr('status_name')
+						if (status_name == 'completed' || status_name == 'in_progress') {
+							alert('Cannot delete');
+						} else {
 
-							    localStorage.setItem('toDel',selected_surface);
+							localStorage.setItem('toDel',selected_surface);
 
 
 //								var action = document.getElementById('action_' + actual_id);
@@ -2071,13 +2201,13 @@ start:function(){
 //								if (action_id == 'missing') {
 //									self_var.remove_missing_action(tooth_id);
 //								}
-								tr.parentNode.removeChild(tr);
-
-							}
+							tr.parentNode.removeChild(tr);
 
 						}
 
-					});
+					}
+
+				});
 
 				});
 				if (selected_treatment_temp.action == false) {
@@ -2094,7 +2224,7 @@ start:function(){
 							status_defined,
 							created_date,
 							is_prev_record, other_history,
-							dignosis,dignosis_description) {
+							dignosis,dignosis_description, amount) {
 //            //console.log("inside put_data")
 //			//console.log("SUrfacesssssssssssss   ,selected_surface_temp,tooth_by_part  ",surfaces, selected_surface_temp, tooth_by_part)
 
@@ -2131,6 +2261,11 @@ start:function(){
 				if (!t_charge) {
 					t_charge = '0.0';
 				}
+				/*Dec*/
+				if (amount) {
+					t_charge = amount;
+				}
+				/*Dec*/
 //				//console.log("Line 33333333333333333333=======")
 				operation_id += 1;
 				var found = self_var.$el.find('.selected_operation');
@@ -2146,19 +2281,38 @@ start:function(){
 
 				/*Change starts here*/
                 /*autocomplete diag code start*/
-                var d_code_data = dignosis_records_by_id[dignosis.id];
-                var desc_data = "";
-                if (dignosis_description && dignosis_description != 'false') {
-                    desc_data = dignosis_description;
-                }
+				/*made on 15-dec*/
+				try {
+					var d_code_data, desc_data = "", diag_disp = "", data_id = "";
+					if (dignosis && dignosis.id) {
+						d_code_data = dignosis_records_by_id[dignosis.id];
+						data_id = dignosis.id;
+						diag_disp += d_code_data.code + "/" + d_code_data.description;
+					}
+					else {
+						diag_disp = "";
+					}
+				}
+				catch (err) {
+					diag_disp = "";
+				}
+				try {
+					if (dignosis_description && dignosis_description != 'false') {
+						desc_data = dignosis_description;
+					}
+				}
+				catch (err) {
+					desc_data = "";
+				}
+
                 table_str += '<td id="dignosis_' + operation_id +
 								'"><input class="diagnosis_code" id="dignosis_code_' +
-								operation_id + '" value="' + d_code_data.code+'/'+ d_code_data.description+'"/></td>';
+								operation_id + '" value="' + diag_disp +'" data-id="'+ data_id +'"/></td>';
                 table_str += '<td id = "dignosis_note_td' + operation_id +
 								'"><input class="dignosis_note" autocomplete="off" id="dignosis_note_' +
 								operation_id + '" value="'+ desc_data +'"/></td>';
 
-
+				/*changed 15-dec*/
                 /*autocomplete diag code end*/
 
 
@@ -2395,13 +2549,29 @@ start:function(){
                 }
 
 				table_str += '<td id = "dentist_' + operation_id + '">' + user_name + '</td>';
-				table_str += '<td id = "amount_' + operation_id + '">' + t_charge + '</td>';
+
+				/*input box for amount field*/
+				var amount_input;
+				if (status_to_use == 'Planned') {
+					amount_input = '<input type="text" ' +
+						' value="'+ t_charge +'" />';
+				}
+				else {
+					amount_input = '<input type="text" readonly="True"' +
+						' value="'+ t_charge +'" />';
+				}
+
+				table_str += '<td id = "amount_' + operation_id + '">' + amount_input + '</td>';
+
 				table_str += '<td class = "progress_table_actions" id = "action_' + operation_id + '">' + selected_treatment_temp.action + '</td>';
 				table_str += '<td class = "delete_td" id = "delete_' + operation_id + '">' + '<img src = "/pragtech_dental_management/static/src/img/delete.png" height = "20px" width = "20px"/>' + '</td>';
+				table_str += '<td class = "copy_td" id = "copy_' + operation_id + '">' +
+					    '<img src = "/pragtech_dental_management/static/src/img/copy.png" height = "20px" width = "20px"/>' +
+					    '</td>';
 				table_str += '<td style = "display:none" id = "previous_' + operation_id + '">' + is_prev_record + '</td>';
 				table_str += '</tr>';
 
-//				console.log("selected_treatment_temp3333333", selected_treatment_temp)
+				//console.log("selected_treatment_temp3333333", selected_treatment_temp, dignosis)
 				$('#progres_table').append(table_str);
 				$('#operation_' + operation_id).click(function() {
 					var found = self_var.$el.find('.selected_operation');
@@ -2412,7 +2582,26 @@ start:function(){
 				});
 
 				/*CHANGED HERE */
-				$('#dignosis_code_'+operation_id).smartAutoComplete({
+				$('#dignosis_code_'+operation_id).autocomplete({
+					select: function (event, ui) {
+						var terms = split(this.value);
+						// remove the current input
+						terms.pop();
+						// add the selected item
+						terms.push(ui.item.label);
+						this.value = terms;
+						$(this).attr('data-id', ui.item.value);
+						return false;
+					},
+					source: function (request, response) {
+						// delegate back to autocomplete, but extract the last term
+//                        if (reg_patient === true) {
+						var res = $.ui.autocomplete.filter(
+							dignosis_records, extractLast(request.term));
+						response(res);
+					}
+				});
+				/*$('#dignosis_code_'+operation_id).smartAutoComplete({
 					source: dignosis_records,
 					filter: function(term, source){
 					    var filtered_and_sorted_list = [];
@@ -2435,7 +2624,7 @@ start:function(){
                         self.update_diag_code($(this).attr('id'), selected_value);
                       },
 
-			  	});
+			  	});*/
 
 				/*autocomplete diag code end*/
 				$('#delete_' + operation_id).click(function() {
@@ -2526,9 +2715,9 @@ start:function(){
 			});
 
 		},
-		update_diag_code: function (id, value) {
+		/*update_diag_code: function (id, value) {
 		    $('#'+id).attr('data-id', dignosis_records[value].id);
-		},
+		},*/
 		get_treatment_cats : function() {
 			var $def = $.Deferred();
 			var self = this;
@@ -2594,11 +2783,12 @@ start:function(){
                 args: [],
             }).then(function(res) {
             	for(var i=0; i<res.length; i++){
-            	    /*var temp = {
+            	    var temp = {
             	        label: res[i]['code'] + '/' + res[i]['description'],
             	        value: res[i]['id']
-            	    };*/
-					dignosis_records[res[i]['code'] + '/' + res[i]['description']] = res[i];
+            	    };
+					dignosis_records.push(temp);
+					//dignosis_records[res[i]['code'] + '/' + res[i]['description']] = res[i];
 					dignosis_records_by_id[res[i]['id']] = res[i];
 				}
             });

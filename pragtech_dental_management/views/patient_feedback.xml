@@ -15,8 +15,8 @@
         <field name="arch" type="xml">
             <tree string="Feedbacks" edit="false" create="false">
                 <field name="feedback_id"/>
-                <field name="name"/>
                 <field name="patient_id"/>
+                <field name="name"/>
                 <field name="feedback_date"/>
             </tree>
         </field>
@@ -36,18 +36,15 @@
 						</div>
 					<group>
 						<group>
-							<field name="language" string="Language/لغة"/>
-
+							<field name="language" string="Language"/>
+							<field name="patient_id"/>
 						</group>
 						<group>
 							<field name="feedback_date"/>
-							<field name="patient_id"/>
+							<field name="name"/>
 						</group>
 					</group>
-					<separator string="YOUR IMPRESSIONS OF US ..." style="color:#47cc3b"
-							   attrs="{'invisible': [('language', '=', 'arabic')]}"/>
-					<separator string="انطباعاتك عنا ..." style="color:#47cc3b"
-							   attrs="{'invisible': [('language', '=', 'english')]}"/>
+					<separator string="YOUR IMPRESSIONS OF US ..." style="color:#47cc3b"/>
 
 					<table style="width:100%;" class="table table-striped">
 					    <tr>

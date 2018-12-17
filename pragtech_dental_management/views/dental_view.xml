@@ -67,10 +67,7 @@
 			<field name="arch" type="xml">
 				<form string="Appointment" version="7.0">
 					<header>
-					   <!-- <button name="sms_send" string="Send SmS" type="object" states="draft"/> -->
-					   <button name="confirm_appointment" string="Confirm" type="object" attrs="{'invisible': ['|',('patient_state', '=', 'withapt'),('state', 'in', ('sms_send', 'confirmed','missed','checkin','ready','done','cancel'))]}"/>
-					   <button name="send_state" string="Send SMS" type="object"  attrs="{'invisible': ['|',('patient_state', '=', 'walkin'),('state', 'in', ('sms_send', 'confirmed','missed','checkin','ready','done','cancel'))]}"/>
-					   <button name="confirm" string="Confirm" type="object" attrs="{'invisible': ['|',('patient_state', '=', 'walkin'),('state', 'not in', ('sms_send', 'draft'))]}"/>
+					   <button name="confirm" string="Confirm" type="object" attrs="{'invisible': ['|',('patient_state', '=', 'walkin'),('state', 'not in', ('draft'))]}"/>
 					   <button name="missed" string="Missed" type="object" states="confirmed"/>
 					   <button name="checkin" string="Checked In" type="object" states="confirmed"/>
 					   <button name="%(action_treatment_plan_wizard)d" string="Treatment Plan Print" type="action" attrs="{'invisible': [('hav_operation', '=', False)]}"/>
@@ -90,8 +87,11 @@
 								<i class="fa fa-dollar" style="font-size:25px;color:red"></i>
 								<field name="amount_due" widget="statinfo" string="Amount Due"/>
 							</button>
-							<button name="appt_open_chart" type="object" string="Open Chart" icon="fa fa-tasks"
-							attrs="{'invisible': [('patient', '=', False)]}"></button>
+							<button name="appt_open_chart" type="object"
+									groups="pragtech_dental_management.group_dental_doc_menu,pragtech_dental_management.group_dental_mng_menu"
+                                    string="Open Chart" icon="fa fa-tasks"
+									attrs="{'invisible': [('patient', '=', False)]}">
+							</button>
 							<button name="action_view_invoice"
 									type="object"
 									class="oe_stat_button"
@@ -99,13 +99,13 @@
 									attrs="{'invisible': ['|', ('patient', '=', False), ('invoice_count', '=', 0)]}">
 								<field name="invoice_count" widget="statinfo" string="Invoices"/>
 							</button>
-							<button name="action_view_payment"
-									type="object"
-									class="oe_stat_button"
-									icon="fa-bars"
-									attrs="{'invisible': ['|', ('patient', '=', False), ('payment_count', '=', 0)]}">
-								<field name="payment_count" widget="statinfo" string="Payments"/>
-							</button>
+							<!--<button name="action_view_payment"-->
+									<!--type="object"-->
+									<!--class="oe_stat_button"-->
+									<!--icon="fa-bars"-->
+									<!--attrs="{'invisible': ['|', ('patient', '=', False), ('payment_count', '=', 0)]}">-->
+								<!--<field name="payment_count" widget="statinfo" string="Payments"/>-->
+							<!--</button>-->
 						</div>
 
 						<div class="oe_title">
@@ -119,8 +119,8 @@
 								<field name="patient_state"/>
 								<field name="patient_name" attrs="{'invisible': ['|', ('is_registered', '=', True), ('patient', '!=', False)], 'required': [('is_registered', '=', False)]}"/>
 								<field name="patient_phone" attrs="{'invisible': ['|', ('is_registered', '=', True), ('patient', '!=', False)]}"/>
-								<field name="patient" attrs="{'invisible': ['&amp;', ('is_registered', '=', False), ('state', 'in', ['draft', 'sms_send'])],'required': [('is_registered', '=', True)]}" context="{'appointment_id_new':id}"/>
-								<field name="qid"/>
+								<field name="patient" attrs="{'invisible': ['&amp;', ('is_registered', '=', False), ('state', 'in', ['draft'])],'required': [('is_registered', '=', True)]}" context="{'appointment_id_new':id}"/>
+								<field name="qid" attrs="{'readonly': [('patient', '!=', False)]}" force_save="1"/>
 								<field name="doctor" required="1" />
 								<field name="urgency"/>
 								<field name="appointment_sdate"/>
@@ -176,30 +176,51 @@
 									<tree string='Operations'>
 											<field name="appt_id" invisible="1"/>
 											<field name="create_date" invisible="1"/>
-											<field name="description" />
+											<field name="description" readonly="1"/>
 											<field name="diagnosis_id" readonly="0"/>
 											<field name="diagnosis_description" readonly="0" />
-											<field name="teeth_id" />
+											<field name="teeth_id" readonly="1"/>
 											<!-- <field name="tooth_function_field"/> -->
-											<field name="state" />
+											<field name="state" readonly="1"/>
 											<!--<field name="signature" widget="image" width="80" height="60" readonly="1"/>-->
                 						<!--<button name="action_consent_form" string="Open consent form" type="object" icon="fa-edit"/>-->
 											<field name="dentist" invisible="1"/>
-											<field name="detail_description" />
+											<field name="detail_description" readonly="1"/>
 											<field name="amount" />
-											<field name="amt_paid_by_patient" />
-											<field name="amt_to_be_patient" />
+											<field name="amt_paid_by_patient" readonly="1"/>
+											<field name="amt_to_be_patient" readonly="1"/>
 									</tree>
 								</field>
 							</page>
 							<page string="Payment Lines" attrs="{'invisible': [('state', 'not in', ['checkin', 'ready', 'done'])]}">
 								<field name="treatment_ids" context="{'default_appointment_id':id}"/>
 							</page>
+							<page string="Attachments" attrs="{'invisible': [('state', 'not in', ['checkin', 'ready', 'done'])]}">
+								<button name="get_img" type="object" string="View Images"/>
+								<field name = "attachment_ids"
+									   context="{'default_res_model': 'medical.appointment','default_res_id': id,'default_patient_id': patient,'default_appointment_id': active_id}">
+										<tree editable="bottom">
+											<field name="name"/>
+											<field name="type" invisible="1"/>
+											<!--<field name="datas_fname" invisible="1" />-->
+											<!--<field name="datas" filename="datas_fname"/>-->
+											<field name="datas" widget="download_link" options="{'filename': 'datas_fname'}"/>
+											<!--<field name="datas" widget="binary" options="{'filename': 'datas_fname'}"/>-->
+											<field name="appointment_id" invisible="1"/>
+											<field name="patient_id" invisible="1"/>
+											<field name="create_date"/>
+										</tree>
+								</field>
+							</page>
 							<page string="Notes">
 								<field name="comments"/>
 							</page>
 						</notebook>
 					</sheet>
+					<div class="oe_chatter">
+						<field name="message_follower_ids" widget="mail_followers"/>
+						<field name="message_ids" widget="mail_thread"/>
+					</div>
 				</form>
 			</field>
 		</record>
@@ -210,13 +231,14 @@
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
 				<tree string='Appointment Information'
-					colors="green:state=='confirmed';red:state=='cancel';orange:state=='sms_send';black:state=='missed';blue:state=='draft';pink:state=='checkin';brown:state=='ready'">
+					colors="green:state=='confirmed';red:state=='cancel';black:state=='missed';blue:state=='draft';pink:state=='checkin';brown:state=='ready'">
 					<field name="name" string="ID"/>
 					<field name="patient_name" string="Name"/>
 					<field name="patient" />
 					<field name="urgency" />
 					<button name="appt_open_chart" string="Chart" type="object"
-					attrs="{'invisible': [('patient', '=', False)]}"/>
+							groups="pragtech_dental_management.group_dental_doc_menu,pragtech_dental_management.group_dental_mng_menu"
+							attrs="{'invisible': [('patient', '=', False)]}"/>
 					<button name="action_view_invoice"
 							string="Invoice"
 							type="object"
@@ -224,13 +246,13 @@
 							attrs="{'invisible': ['|', ('patient', '=', False), ('invoice_count', '=', 0)]}">
 						<field name="invoice_count" widget="statinfo" string="Invoices"/>
 					</button>
-					<button name="action_view_payment"
-							string="Payment"
-							type="object"
-							class="oe_stat_button"
-							attrs="{'invisible': ['|', ('patient', '=', False), ('payment_count', '=', 0)]}">
-						<field name="payment_count" widget="statinfo" string="Payments"/>
-					</button>
+					<!--<button name="action_view_payment"-->
+							<!--string="Payment"-->
+							<!--type="object"-->
+							<!--class="oe_stat_button"-->
+							<!--attrs="{'invisible': ['|', ('patient', '=', False), ('payment_count', '=', 0)]}">-->
+						<!--<field name="payment_count" widget="statinfo" string="Payments"/>-->
+					<!--</button>-->
 					<field name="appointment_sdate" />
 					<field name="doctor" />
 					<field name="room_id" />
@@ -343,7 +365,7 @@
 			<field name="model">medical.appointment</field>
 			<field name="type">tree</field>
 			<field name="arch" type="xml">
-				<tree string='Appointment Information' colors="green:state=='confirmed';red:state=='cancel';orange:state=='sms_send';black:state=='missed';blue:state=='draft';pink:state=='checkin';brown:state=='ready'" >
+				<tree string='Appointment Information' colors="green:state=='confirmed';red:state=='cancel';black:state=='missed';blue:state=='draft';pink:state=='checkin';brown:state=='ready'" >
 					<field name="name"/>
 					<field name="patient"/>
 					<field name="appointment_sdate"/>
@@ -368,6 +390,7 @@
 								<field name="name" required="1"
 									context="{'default_is_doctor': 1, 'search_default_is_doctor': 1}" />
 								<field name="speciality" />
+								<field name="license_code" />
 								<field name="institution"
 									context="{'default_is_institution': 1, 'search_default_is_institution': 1}" />
 								<field name="code" />
@@ -391,6 +414,7 @@
 					<field name="code" />
 					<field name="institution" />
 					<field name="speciality" />
+					<field name="license_code" />
 				</tree>
 			</field>
 		</record>
@@ -975,7 +999,7 @@
 								<i class="fa fa-dollar" style="font-size:25px;color:red"></i>
 								<field name="amount_due" widget="statinfo" string="Amount Due"/>
 							</button>
-					<button name="open_chart" type="object" string="Open Chart" icon="fa fa-tasks"></button>
+					<button name="open_chart" groups="pragtech_dental_management.group_dental_doc_menu,pragtech_dental_management.group_dental_mng_menu" type="object" string="Open Chart" icon="fa fa-tasks"></button>
                     <button name="action_view_invoice"
                             type="object"
                             class="oe_stat_button"
@@ -983,13 +1007,13 @@
                             attrs="{'invisible': [('invoice_count', '=', 0)]}">
                         <field name="invoice_count" widget="statinfo" string="Invoices"/>
                     </button>
-                    <button name="action_view_payment"
-                            type="object"
-                            class="oe_stat_button"
-                            icon="fa-bars"
-                            attrs="{'invisible': [('payment_count', '=', 0)]}">
-                        <field name="payment_count" widget="statinfo" string="Payments"/>
-                    </button>
+                    <!--<button name="action_view_payment"-->
+                            <!--type="object"-->
+                            <!--class="oe_stat_button"-->
+                            <!--icon="fa-bars"-->
+                            <!--attrs="{'invisible': [('payment_count', '=', 0)]}">-->
+                        <!--<field name="payment_count" widget="statinfo" string="Payments"/>-->
+                    <!--</button>-->
                 </div>
                 <div class="oe_title">
                     <h1>
@@ -1018,7 +1042,7 @@
 					<field name="state" invisible="1"/>
 				</group>
 				<group col="2" colspan="1" rowspan="1">
-					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120" />
+					<field name="photo"  nolabel="1" img_width="120" img_height="120" width="120" height="120" widget="image"/>
 				</group>
 				</group>
 				<notebook>
@@ -1381,12 +1405,29 @@
                                 <td>
                                     <label for="q50" string="How often do you brush/floss?"/>
                                 </td>
-                                <td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
                                     <label for="q50"/>
+                                </td>
+                                <td>
                                     <field name="q50"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
                                     <label for="q51"/>
+                                </td>
+                                <td>
                                     <field name="q51"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: center;">
                                     <label for="q52"/>
+                                </td>
+                                <td>
                                     <field name="q52"/>
                                 </td>
                             </tr>
@@ -1609,12 +1650,21 @@
                         <!--</group>-->
                     <!--</page>-->
                     <page string="Images">
-                    	<button name="get_img" type="object" string="View Images"></button>
-                    	<field name = "attachment_ids"  context="{'default_res_model': 'medical.patient','default_res_id': id}">
-                               <field name = "datas"/>
+                    	<button name="get_img" type="object" string="View Images"/>
+                    	<field name = "attachment_ids"
+							   context="{'default_res_model': 'medical.patient','default_res_id': id,'default_patient_id': active_id}">
+                                <tree editable="bottom">
+									<field name="appointment_id"/>
+									<field name="name"/>
+									<field name="type" invisible="1"/>
+									<!--<field name="datas_fname" invisible="1" />-->
+									<!--<field name="datas" filename="datas_fname"/>-->
+									<field name="datas" widget="download_link" options="{'filename': 'datas_fname'}"/>
+									<!--<field name="datas" widget="binary" options="{'filename': 'datas_fname'}"/>-->
+									<field name="patient_id" invisible="1"/>
+									<field name="create_date"/>
+								</tree>
                         </field>
-
-                        	<!-- <field name = "datas"/> -->
                     </page>
                     <page string="Patient Complaints">
                         <group colspan="4" col="8" >
@@ -1679,7 +1729,7 @@
 					<!-- <field name="lastname"/> -->
 					<field name="patient_id" />
 					<field name="mobile"/>
-					<button name="open_chart" type="object" string="Chart"></button>
+					<button name="open_chart" type="object" string="Chart" groups="pragtech_dental_management.group_dental_doc_menu,pragtech_dental_management.group_dental_mng_menu"></button>
                     <button name="action_view_invoice"
 							string="Invoice"
                             type="object"
@@ -1687,13 +1737,13 @@
                             attrs="{'invisible': [('invoice_count', '=', 0)]}">
                         <field name="invoice_count" widget="statinfo" string="Invoices"/>
                     </button>
-                    <button name="action_view_payment"
-							string="Payment"
-                            type="object"
-                            class="oe_stat_button"
-                            attrs="{'invisible': [('payment_count', '=', 0)]}">
-                        <field name="payment_count" widget="statinfo" string="Payments"/>
-                    </button>
+                    <!--<button name="action_view_payment"-->
+							<!--string="Payment"-->
+                            <!--type="object"-->
+                            <!--class="oe_stat_button"-->
+                            <!--attrs="{'invisible': [('payment_count', '=', 0)]}">-->
+                        <!--<field name="payment_count" widget="statinfo" string="Payments"/>-->
+                    <!--</button>-->
 					<field name="sex" />
 					<field name="dob" />
 					<field name="deceased" />
@@ -2148,7 +2198,7 @@
 				<form string="Prescription">
 					<header>
 						<!-- <button name="create_invoices" string="Create Invoice" type="object" 
-							attrs="{'invisible': ['|','|',('invoice_done', '=', True),('state', '=', 
+							attrs="{'invisible': ['|','|',('invoice_done', '=', True),('state', '=',
 							'invoiced'),('no_invoice', '=', True)]}"/> -->
 					</header>
 					<sheet>
@@ -2669,7 +2719,7 @@
 					<field name="teeth_id" />
 					<!-- <field name="tooth_function_field"/> -->
 					<field name="state" />
-					<field name="signature" width="80" height="60" readonly="1"/>
+					<field name="signature" widget="image" width="80" height="60" readonly="1"/>
                 	<button name="action_consent_form" string="Open consent form" type="object" icon="fa-edit"/>
 					<field name="dentist" />
 					<field name="detail_description" />
@@ -2721,8 +2771,8 @@
 
 						<group>
 							<group>
-								<field name="name" />
 								<field name="patient_id" />
+								<field name="name" />
 								<field name="complaint_subject" />
 								<field name="complaint" />
 							</group>
@@ -2730,6 +2780,7 @@
 								<field name="complaint_date" />
 								<field name="language" string="Language"/>
 								<field name="action_ta" />
+								<field name="action_by" />
 							</group>
 						</group>
 					</sheet>
@@ -2745,16 +2796,15 @@
 					<group>
 						<group>
 							<field name="language" string="Language/لغة"/>
-							<field name="name" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
-							<field name="name" string="مزود"
-								   attrs="{'invisible': [('language', '=', 'english')]}"/>
-						</group>
+							<field name="patient_id" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
+							<field name="patient_id" string="صبور"
+								   attrs="{'invisible': [('language', '=', 'english')]}"/>						</group>
 						<group>
 							<field name="complaint_date" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
 							<field name="complaint_date" string="تاريخ"
 								   attrs="{'invisible': [('language', '=', 'english')]}"/>
-							<field name="patient_id" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
-							<field name="patient_id" string="صبور"
+							<field name="name" attrs="{'invisible': [('language', '=', 'arabic')]}"/>
+							<field name="name" string="حضر الطبيب"
 								   attrs="{'invisible': [('language', '=', 'english')]}"/>
 						</group>
 					</group>
@@ -2800,8 +2850,8 @@
 			<field name="arch" type="xml">
 				<tree string='Patient Complaints' create="false">
 					<field name="complaint_id"/>
-					<field name="name"/>
 					<field name="patient_id" />
+					<field name="name"/>
 					<field name="complaint_subject" />
 					<field name="complaint_date" />
 					<field name="complaint" />

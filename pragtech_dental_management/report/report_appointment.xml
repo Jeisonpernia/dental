@@ -3,7 +3,7 @@
 	<data>
 
 		<template id="report_appointment_document">
-			<t t-call="web.external_layout">
+			<t t-call="web.internal_new_layout">
 				<t t-set="doc" t-value="doc.with_context({'lang':doc.doctor.name.lang})" />
 				<!-- <t t-foreach="docs" t-as="doc" > -->
 				<div class="page">

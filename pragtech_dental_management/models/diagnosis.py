@@ -18,6 +18,17 @@ class Diagnosis(models.Model):
     code = fields.Char('Code', required=True)
     description = fields.Text('Description', required=True)
 
+    @api.multi
+    @api.depends('code', 'description')
+    def name_get(self):
+        result = []
+        for rcd in self:
+            name = rcd.code or ''
+            if rcd.description:
+                name += '/' + rcd.description
+            result.append((rcd.id, name))
+        return result
+
     @api.model
     def get_all_records(self):
         diagnosis_obj=self.env['diagnosis'].search_read([])
